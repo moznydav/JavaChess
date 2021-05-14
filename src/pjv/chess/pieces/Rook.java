@@ -48,6 +48,17 @@ public class Rook extends ChessPiece{
     public String toString(){ return "R"; }
 
 
+    @Override
+    public boolean isKing(){
+        return false;
+    }
+
+    @Override
+    public ChessPiece movePiece(Move move) {
+
+        return new Rook(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
+    }
+
     private boolean isOverEdgeMove(int piecePosition, int offset){
 
         int columnNumber = Utils.getColumnNumber(piecePosition);

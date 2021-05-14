@@ -73,6 +73,17 @@ public class Pawn extends ChessPiece{
     @Override
     public String toString(){ return "P"; }
 
+    @Override
+    public boolean isKing(){
+        return false;
+    }
+
+    @Override
+    public ChessPiece movePiece(Move move) {
+
+        return new Pawn(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
+    }
+
 }
 
 

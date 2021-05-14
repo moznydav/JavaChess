@@ -2,6 +2,7 @@ package pjv.chess.board;
 
 import jdk.jshell.execution.Util;
 import pjv.chess.pieces.*;
+import pjv.chess.players.Player;
 
 import javax.management.ImmutableDescriptor;
 import java.util.*;
@@ -12,6 +13,10 @@ public class Board {
     Collection<ChessPiece> whitePieces;
     Collection<ChessPiece> blackPieces;
 
+    private Player whitePlayer;
+    private Player blackPlayer;
+    private Player currentPlayer;
+
     private Board(Builder builder) {
         this.chessBoard = createChessBoard(builder);
         this.whitePieces = countActivePieces(this.chessBoard,true);
@@ -19,6 +24,12 @@ public class Board {
 
         List<Move> whiteLegalMoves = calculateLegalMoves(this.whitePieces);
         List<Move> blackLegalMoves = calculateLegalMoves(this.blackPieces);
+
+        //boolean isWhitesTurn = true;
+
+        this.whitePlayer = new Player(this, true, whiteLegalMoves, blackLegalMoves);
+        this.blackPlayer = new Player(this, false, whiteLegalMoves, blackLegalMoves);
+        this.currentPlayer = builder.thisTurn ? this.whitePlayer : this.blackPlayer;
     }
 
     private List<ChessPiece> countActivePieces(List<Tile> chessBoard, boolean alliance){
@@ -34,6 +45,35 @@ public class Board {
         }
     return activePieces;
     }
+
+    public Collection<ChessPiece> getWhitePieces() {
+        return this.whitePieces;
+    }
+    public Collection<ChessPiece> getBlackPieces(){
+        return this.blackPieces;
+    }
+
+    public Player getWhitePlayer(){
+        return this.whitePlayer;
+    }
+
+    public Player getBlackPlayer(){
+        return this.blackPlayer;
+    }
+
+    public Player getCurrentPlayer(){
+        return this.currentPlayer;
+    }
+
+    public Collection<Move> getAllLegalMoves(){
+
+        Collection<Move> allLegalMoves = this.whitePlayer.getMyMoves();
+
+        allLegalMoves.addAll(this.blackPlayer.getMyMoves());
+
+        return allLegalMoves;
+    }
+
 
     private List<Move> calculateLegalMoves(Collection<ChessPiece> chessPieces) {
         List<Move> legalMoves = new ArrayList<>();
@@ -77,26 +117,26 @@ public class Board {
 
         //white pieces
 
-        builder.setPiece(new Rook(48,true));
-        builder.setPiece(new Knight(49,true));
-        builder.setPiece(new Bishop(50,true));
-        builder.setPiece(new Queen(51,true));
-        builder.setPiece(new King(52,true));
-        builder.setPiece(new Bishop(53,true));
-        builder.setPiece(new Knight(54, true));
-        builder.setPiece(new Rook(55,true));
-        builder.setPiece(new Pawn(56,true));
-        builder.setPiece(new Pawn(57,true));
-        builder.setPiece(new Pawn(58,true));
-        builder.setPiece(new Pawn(59,true));
-        builder.setPiece(new Pawn(60,true));
-        builder.setPiece(new Pawn(61,true));
-        builder.setPiece(new Pawn(62,true));
-        builder.setPiece(new Pawn(63,true));
+        builder.setPiece(new Rook(56,true));
+        builder.setPiece(new Knight(57,true));
+        builder.setPiece(new Bishop(58,true));
+        builder.setPiece(new Queen(59,true));
+        builder.setPiece(new King(60,true));
+        builder.setPiece(new Bishop(61,true));
+        builder.setPiece(new Knight(62, true));
+        builder.setPiece(new Rook(63,true));
+        builder.setPiece(new Pawn(48,true));
+        builder.setPiece(new Pawn(49,true));
+        builder.setPiece(new Pawn(50,true));
+        builder.setPiece(new Pawn(51,true));
+        builder.setPiece(new Pawn(52,true));
+        builder.setPiece(new Pawn(53,true));
+        builder.setPiece(new Pawn(54,true));
+        builder.setPiece(new Pawn(55,true));
         //*/
 
         //white has the first move
-        builder.activeTurn(true);
+        builder.setNextTurn(true);
 
         return builder.build();
     }
@@ -105,6 +145,7 @@ public class Board {
 
         return chessBoard.get(tileCoord);
     }
+
 
     @Override
     public String toString(){
@@ -122,7 +163,7 @@ public class Board {
     public static class Builder{
 
         Map<Integer, ChessPiece> boardConfig;
-        boolean whitesTurn = true;
+        boolean thisTurn = true;
 
         public Builder(){
             this.boardConfig = new HashMap<>();
@@ -133,8 +174,12 @@ public class Board {
             return this;
         }
 
-        public Builder activeTurn(boolean currentTurn) {
-            this.whitesTurn = currentTurn;
+        public Player chooseActivePlayer(Player whitePlayer, Player blackPlayer, boolean isWhitesTurn){
+            return isWhitesTurn ? whitePlayer : blackPlayer;
+        }
+
+        public Builder setNextTurn(boolean nextTurn){ //true - white
+            this.thisTurn = nextTurn;
             return this;
         }
 
