@@ -149,11 +149,7 @@ public class Table {
             int rowNumber = Utils.getRowNumber(this.tileID);
             int columnNumber = Utils.getColumnNumber(this.tileID);
 
-            if(rowNumber % 2 == columnNumber % 2){
-                setBackground(lightTileColor);
-            } else {
-                setBackground(darkTileColor);
-            }
+            setBackground(rowNumber % 2 == columnNumber % 2 ? lightTileColor : darkTileColor);
         }
     }
 
