@@ -42,7 +42,8 @@ public class Table {
     private static Dimension TILE_PANEL_DIMENSION = new Dimension(BOARD_WIDTH / Utils.ROW_LENGTH, BOARD_HEIGHT / Utils.COLUMN_HEIGHT);
 
     private static String CHESS_PIECES_IMAGES_PATH = "gui/chesspieces/";
-    private static String HIGHLIGHT_DOT_PATH = "gui/move_highlighter.gif";
+    private static String HIGHLIGHT_DOT_PATH = "gui/move_highlighter.png";
+    private static String PIECE_HIGHLIGHT_PATH = "gui/piece_highlighter.png";
 
     private Color lightTileColor = Color.decode("#FFFACC");
     private Color darkTileColor = Color.decode("#593E1B");
@@ -198,11 +199,7 @@ public class Table {
                                 System.out.println("Destination selected" + destinationTile.getTileCoordinates());
                                 final Move move = Move.moveMaker.createMove(chessBoard, sourceTile.getTileCoordinates(), destinationTile.getTileCoordinates());
                                 final BoardTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
-                                System.out.println("I got here");
-                                System.out.println(transition.getMoveStatus().isIllegal() ? "its is illegal" : "it is legal") ;
-
                                 if(transition.getMoveStatus().isDone()){
-                                    System.out.println("I even got here");
                                     chessBoard = transition.getNewBoard();
                                     //TODO add move to move log for PGN save
                                 }
@@ -282,6 +279,7 @@ public class Table {
             assignTileColor();
             assignChessPieceIcon(chessBoard);
             highlightLegalMoves(board);
+
             validate();
             repaint();
         }

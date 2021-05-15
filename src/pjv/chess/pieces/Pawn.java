@@ -50,8 +50,8 @@ public class Pawn extends ChessPiece{
                     case 7:
                         pieceAtDestination = destinationTile.getPiece();
                         if(!destinationTile.isEmpty() && pieceAtDestination.alliance != this.alliance){
-                            if((this.alliance && Utils.getColumnNumber(this.piecePosition) == 8) || /*is white*/
-                                    (!this.alliance && Utils.getColumnNumber(this.piecePosition) == 1) /*is black*/){
+                            if((this.alliance && Utils.getColumnNumber(this.piecePosition) != 8) || /*is white*/
+                                    (!this.alliance && Utils.getColumnNumber(this.piecePosition) != 1) /*is black*/){
                                 legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
                             }
                         }
@@ -60,8 +60,8 @@ public class Pawn extends ChessPiece{
                     case 9:
                         pieceAtDestination = destinationTile.getPiece();
                         if(!destinationTile.isEmpty() && pieceAtDestination.alliance != this.alliance){
-                            if((this.alliance && Utils.getColumnNumber(this.piecePosition) == 1) || /*is white*/
-                                    (!this.alliance && Utils.getColumnNumber(this.piecePosition) == 8) /*is black*/){
+                            if((this.alliance && Utils.getColumnNumber(this.piecePosition) != 1) || /*is white*/
+                                    (!this.alliance && Utils.getColumnNumber(this.piecePosition) != 8) /*is black*/){
                                 legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
                             }
                         }

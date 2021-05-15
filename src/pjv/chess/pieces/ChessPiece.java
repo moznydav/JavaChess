@@ -59,4 +59,5 @@ public abstract class ChessPiece {
     public abstract boolean isKing();
 
     public abstract ChessPiece movePiece(Move move);
+
 }
