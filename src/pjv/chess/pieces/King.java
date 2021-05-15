@@ -27,7 +27,6 @@ public class King extends ChessPiece{
                 Tile destinationTile = board.getTile(destinationCoordinate);
 
                 if(destinationTile.isEmpty()) {
-                    //TODO castling;
                     legalMoves.add(new Move.DefaultMove(board, this, destinationCoordinate));
                 } else {
                     ChessPiece pieceAtDestination = destinationTile.getPiece();
@@ -38,9 +37,6 @@ public class King extends ChessPiece{
                     }
                 }
             }
-
-
-
         }
         return legalMoves;
     }
