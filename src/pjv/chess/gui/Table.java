@@ -1,11 +1,15 @@
 package pjv.chess.gui;
 
-import pjv.chess.board.Utils;
+import pjv.chess.board.*;
+import pjv.chess.pieces.ChessPiece;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +17,11 @@ public class Table {
 
     private JFrame gameFrame;
     private BoardTablePanel boardTablePanel;
+    private Board chessBoard;
+
+    private Tile sourceTile;
+    private Tile destinationTile;
+    private ChessPiece movedPiece;
 
     //Both height and width of Board table panel dimension should be divisible by ROW_COUNT and COLUMN_COUNT so tiles will be clean
     //TODO make Table and BoardTable dependant on Tile dimension not vice versa
@@ -27,10 +36,14 @@ public class Table {
     private static Dimension BOARD_TABLE_PANEL_DIMENSION = new Dimension(BOARD_WIDTH, BOARD_HEIGHT);
     private static Dimension TILE_PANEL_DIMENSION = new Dimension(BOARD_WIDTH / Utils.ROW_LENGTH, BOARD_HEIGHT / Utils.COLUMN_HEIGHT);
 
+    private static String CHESS_PIECES_IMAGES_PATH = "gui/chesspieces/";
+
+
     private Color lightTileColor = Color.decode("#FFFACC");
     private Color darkTileColor = Color.decode("#593E1B");
 
     public Table(){
+        this.chessBoard = Board.createStandardBoard();
         this.gameFrame = new JFrame("Chess");
         this.gameFrame.setLayout(new BorderLayout());
 
@@ -140,8 +153,74 @@ public class Table {
             this.tileID = tileID;
             setPreferredSize(TILE_PANEL_DIMENSION);
             assignTileColor();
-            validate();
+            assignChessPieceIcon(chessBoard);
 
+            addMouseListener(new MouseListener() { //will implement drag and drop and click and play - click and play will have right mouse button for release
+                @Override
+                public void mouseClicked(MouseEvent e) {
+
+                    if(isRightMouseButton(e)){
+                        sourceTile = null;
+                        destinationTile = null;
+                        movedPiece = null;
+                    }
+
+                    else if(isLeftMouseButton(e)){
+                        //first left click
+                        if(sourceTile == null) {
+                            sourceTile = chessBoard.getTile(tileID);
+                            movedPiece = sourceTile.getPiece();
+                            if (movedPiece == null) {
+                                sourceTile = null;
+                            }
+                        } else {
+
+                            destinationTile = chessBoard.getTile(tileID);
+                            if(sourceTile == destinationTile){
+                                sourceTile = null;
+                                destinationTile = null;
+                                movedPiece = null;
+                            } else {
+                                final Move move = null;
+                                final BoardTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
+                                if(transition.getMoveStatus().isDone()){
+                                    //chessBoard = chessBoard.getCurrentPlayer().makeMove(move);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) { }
+
+                @Override
+                public void mouseReleased(MouseEvent e) { }
+
+                @Override
+                public void mouseEntered(MouseEvent e) { }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                }
+            });
+
+            validate();
+        }
+
+        private void assignChessPieceIcon(Board board){
+            this.removeAll();
+            if(!board.getTile(this.tileID).isEmpty()){
+                try{
+                    BufferedImage pieceImage = ImageIO.read(new File(CHESS_PIECES_IMAGES_PATH +
+                            (board.getTile(this.tileID).getPiece().getPieceAlliance() ? "white_" : "black_") +
+                            board.getTile(this.tileID).getPiece().toString() + ".gif"));
+                    add(new JLabel(new ImageIcon(pieceImage)));
+                } catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
         }
 
         private void assignTileColor() {
