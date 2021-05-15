@@ -14,4 +14,12 @@ public class BoardTransition {
         this.move = move;
         this.moveStatus = moveStatus;
     }
+
+    public Move.MoveStatus getMoveStatus(){
+        return this.moveStatus;
+    }
+
+    public Board getNewBoard(){
+        return this.newBoard;
+    }
 }

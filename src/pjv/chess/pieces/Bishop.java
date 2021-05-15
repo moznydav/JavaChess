@@ -24,7 +24,7 @@ public class Bishop extends ChessPiece{
         for(int currentOffset: MOVE_OFFSETS){
             int destinationCoordinate = this.piecePosition;
 
-            while(Utils.isValidCoordinate(destinationCoordinate+currentOffset) && !isOverEdgeMove(this.piecePosition, currentOffset)){
+            while(Utils.isValidCoordinate(destinationCoordinate+currentOffset) && !isOverEdgeMove(destinationCoordinate, currentOffset)){
                 destinationCoordinate += currentOffset;
                 Tile destinationTile = board.getTile(destinationCoordinate);
 
@@ -40,8 +40,6 @@ public class Bishop extends ChessPiece{
                     break;
                 }
             }
-
-
         }
         return legalMoves;
     }

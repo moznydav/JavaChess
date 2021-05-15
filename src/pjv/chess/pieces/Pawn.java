@@ -41,16 +41,17 @@ public class Pawn extends ChessPiece{
                         break;
                     case 16:
                         if (destinationTile.isEmpty() &&
-                                board.getTile(destinationCoordinate - offsetCoefficient * currentOffset).isEmpty() &&
-                                Utils.getRowNumber(this.piecePosition) + HALFPOINT * offsetCoefficient == HALF_OF_ROWS) {
+                                board.getTile(destinationCoordinate).isEmpty() &&
+                                ((Utils.getRowNumber(this.piecePosition) == 2 && !this.alliance) || //is black and is in 2nd row
+                                        (Utils.getRowNumber(this.piecePosition) == 7 && this.alliance))) { //is white and is in 7th row
                             legalMoves.add(new Move.DefaultMove(board, this, destinationCoordinate));
                         }
                         break;
                     case 7:
                         pieceAtDestination = destinationTile.getPiece();
                         if(!destinationTile.isEmpty() && pieceAtDestination.alliance != this.alliance){
-                            if((this.alliance && Utils.getColumnNumber(this.piecePosition) == 8) || /*is white*/
-                                    (!this.alliance && Utils.getColumnNumber(this.piecePosition) == 1) /*is black*/){
+                            if((this.alliance && Utils.getColumnNumber(this.piecePosition) != 8) || /*is white*/
+                                    (!this.alliance && Utils.getColumnNumber(this.piecePosition) != 1) /*is black*/){
                                 legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
                             }
                         }
@@ -59,8 +60,8 @@ public class Pawn extends ChessPiece{
                     case 9:
                         pieceAtDestination = destinationTile.getPiece();
                         if(!destinationTile.isEmpty() && pieceAtDestination.alliance != this.alliance){
-                            if((this.alliance && Utils.getColumnNumber(this.piecePosition) == 1) || /*is white*/
-                                    (!this.alliance && Utils.getColumnNumber(this.piecePosition) == 8) /*is black*/){
+                            if((this.alliance && Utils.getColumnNumber(this.piecePosition) != 1) || /*is white*/
+                                    (!this.alliance && Utils.getColumnNumber(this.piecePosition) != 8) /*is black*/){
                                 legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
                             }
                         }
@@ -85,12 +86,6 @@ public class Pawn extends ChessPiece{
     }
 
 }
-
-
-
-
-
-
 
 
 

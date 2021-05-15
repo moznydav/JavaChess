@@ -61,9 +61,7 @@ public class Board {
         return this.blackPlayer;
     }
 
-    public Player getCurrentPlayer(){
-        return this.currentPlayer;
-    }
+    public Player getCurrentPlayer(){ return this.currentPlayer; }
 
     public Collection<Move> getAllLegalMoves(){
 
@@ -163,7 +161,7 @@ public class Board {
     public static class Builder{
 
         Map<Integer, ChessPiece> boardConfig;
-        boolean thisTurn = true;
+        boolean thisTurn;
 
         public Builder(){
             this.boardConfig = new HashMap<>();

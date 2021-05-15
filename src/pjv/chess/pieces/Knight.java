@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Knight extends ChessPiece{
 
-    private final static int[] MOVE_OFFSETS = {-17, -15, -10, -6, 6, 10, -15, -17}; //offsets from current location for "knight move"
+    private final static int[] MOVE_OFFSETS = {-17, -15, -10, -6, 6, 10, 15, 17}; //offsets from current location for "knight move"
 
     public Knight(int piecePosition, boolean alliance) {
         super(piecePosition, alliance);
