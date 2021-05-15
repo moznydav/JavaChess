@@ -18,4 +18,8 @@ public class BoardTransition {
     public Move.MoveStatus getMoveStatus(){
         return this.moveStatus;
     }
+
+    public Board getNewBoard(){
+        return this.newBoard;
+    }
 }

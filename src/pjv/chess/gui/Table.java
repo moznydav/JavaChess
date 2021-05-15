@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.swing.SwingUtilities.isLeftMouseButton;
+import static javax.swing.SwingUtilities.isRightMouseButton;
+
 public class Table {
 
     private JFrame gameFrame;
@@ -141,6 +144,16 @@ public class Table {
             setPreferredSize(BOARD_TABLE_PANEL_DIMENSION);
             validate();
         }
+
+        public void drawBoard(Board chessBoard) {
+            removeAll();
+            for(TilePanel tilePanel : boardTiles){
+                tilePanel.drawTile();
+                add(tilePanel);
+            }
+            validate();
+            repaint();
+        }
     }
 
     private class TilePanel extends JPanel{
@@ -160,35 +173,43 @@ public class Table {
                 public void mouseClicked(MouseEvent e) {
 
                     if(isRightMouseButton(e)){
-                        sourceTile = null;
-                        destinationTile = null;
-                        movedPiece = null;
+                        System.out.println("Rightclicked");
+                        clearSelection();
                     }
 
                     else if(isLeftMouseButton(e)){
-                        //first left click
                         if(sourceTile == null) {
                             sourceTile = chessBoard.getTile(tileID);
                             movedPiece = sourceTile.getPiece();
+
+                            System.out.println("Leftclicked");
+                            System.out.println("Piece selected:" + movedPiece.toString());
                             if (movedPiece == null) {
                                 sourceTile = null;
                             }
                         } else {
-
                             destinationTile = chessBoard.getTile(tileID);
-                            if(sourceTile == destinationTile){
-                                sourceTile = null;
-                                destinationTile = null;
-                                movedPiece = null;
+                            if(sourceTile.getTileCoordinates() == destinationTile.getTileCoordinates()){
+
+                                clearSelection();
                             } else {
-                                final Move move = null;
+                                System.out.println("Destination selected" + destinationTile.getTileCoordinates());
+                                final Move move = Move.moveMaker.createMove(chessBoard, sourceTile.getTileCoordinates(), destinationTile.getTileCoordinates());
                                 final BoardTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
                                 if(transition.getMoveStatus().isDone()){
-                                    //chessBoard = chessBoard.getCurrentPlayer().makeMove(move);
+                                    System.out.println("I made it here");
+                                    chessBoard = transition.getNewBoard();
+                                    //TODO add move to move log for PGN save
                                 }
                             }
                         }
                     }
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            boardTablePanel.drawBoard(chessBoard);
+                        }
+                    });
                 }
 
                 @Override
@@ -230,6 +251,20 @@ public class Table {
 
             setBackground(rowNumber % 2 == columnNumber % 2 ? lightTileColor : darkTileColor);
         }
+
+        public void drawTile() {
+            assignTileColor();
+            assignChessPieceIcon(chessBoard);
+            validate();
+            repaint();
+        }
+    }
+
+    private void clearSelection(){
+        System.out.println("Piece selection reset");
+        sourceTile = null;
+        destinationTile = null;
+        movedPiece = null;
     }
 
 }
