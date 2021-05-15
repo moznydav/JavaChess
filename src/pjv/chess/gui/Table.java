@@ -145,8 +145,11 @@ public class Table {
         }
 
         private void assignTileColor() {
-            if(Utils.getRowNumber(this.tileID) % 2 == 0 && this.tileID % 2 == 0 ||
-                    (Utils.getRowNumber(this.tileID) % 2 == 1 && this.tileID % 2 == 1)){
+
+            int rowNumber = Utils.getRowNumber(this.tileID);
+            int columnNumber = Utils.getColumnNumber(this.tileID);
+
+            if(rowNumber % 2 == columnNumber % 2){
                 setBackground(lightTileColor);
             } else {
                 setBackground(darkTileColor);
