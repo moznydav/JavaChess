@@ -16,8 +16,6 @@ public class Player {
     Collection<Move> opponentsMoves;
 
 
-
-
     public Player(Board board, boolean alliance, Collection<Move> whiteLegalMoves, Collection<Move> blackLegalMoves) {
 
         this.board = board;
@@ -52,6 +50,8 @@ public class Player {
     public King getPlayerKing() { return this.playerKing; }
 
     public Collection<Move> getMyMoves(){ return this.myMoves; }
+
+    public boolean getAlliance(){ return this.alliance; }
 
     Collection<Move> calculateCastleMoves(Collection<Move> playerLegalMoves, Collection<Move> opponentLegalMoves, boolean alliance){ //white = true;
         Collection<Move> kingCastleMoves = new ArrayList<>();

@@ -11,6 +11,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static javax.swing.SwingUtilities.isLeftMouseButton;
@@ -40,7 +42,7 @@ public class Table {
     private static Dimension TILE_PANEL_DIMENSION = new Dimension(BOARD_WIDTH / Utils.ROW_LENGTH, BOARD_HEIGHT / Utils.COLUMN_HEIGHT);
 
     private static String CHESS_PIECES_IMAGES_PATH = "gui/chesspieces/";
-
+    private static String HIGHLIGHT_DOT_PATH = "gui/move_highlighter.gif";
 
     private Color lightTileColor = Color.decode("#FFFACC");
     private Color darkTileColor = Color.decode("#593E1B");
@@ -148,7 +150,7 @@ public class Table {
         public void drawBoard(Board chessBoard) {
             removeAll();
             for(TilePanel tilePanel : boardTiles){
-                tilePanel.drawTile();
+                tilePanel.drawTile(chessBoard);
                 add(tilePanel);
             }
             validate();
@@ -196,10 +198,16 @@ public class Table {
                                 System.out.println("Destination selected" + destinationTile.getTileCoordinates());
                                 final Move move = Move.moveMaker.createMove(chessBoard, sourceTile.getTileCoordinates(), destinationTile.getTileCoordinates());
                                 final BoardTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
+                                System.out.println("I got here");
+                                System.out.println(transition.getMoveStatus().isIllegal() ? "its is illegal" : "it is legal") ;
+
                                 if(transition.getMoveStatus().isDone()){
+                                    System.out.println("I even got here");
                                     chessBoard = transition.getNewBoard();
                                     //TODO add move to move log for PGN save
                                 }
+                                sourceTile = null;
+                                movedPiece = null;
                             }
                         }
                     }
@@ -243,6 +251,25 @@ public class Table {
             }
         }
 
+        private void highlightLegalMoves(Board board){ //used for debugging
+                for(Move move : pieceLegalMoves(board)){
+                    if(move.getDestinationCoordinate() == this.tileID){
+                        try {
+                            add(new JLabel(new ImageIcon(ImageIO.read(new File(HIGHLIGHT_DOT_PATH)))));
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        private Collection<Move> pieceLegalMoves(final Board board) {
+            if(movedPiece != null && movedPiece.getPieceAlliance() == board.getCurrentPlayer().getAlliance()) {
+                return movedPiece.calculateAllLegalMoves(board);
+            }
+            return Collections.emptyList();
+        }
+
+
         private void assignTileColor() {
 
             int rowNumber = Utils.getRowNumber(this.tileID);
@@ -251,9 +278,10 @@ public class Table {
             setBackground(rowNumber % 2 == columnNumber % 2 ? lightTileColor : darkTileColor);
         }
 
-        public void drawTile() {
+        public void drawTile(Board board) {
             assignTileColor();
             assignChessPieceIcon(chessBoard);
+            highlightLegalMoves(board);
             validate();
             repaint();
         }

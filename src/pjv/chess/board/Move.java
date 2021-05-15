@@ -31,7 +31,7 @@ public abstract class Move {
         }
         builder.setPiece(this.movedPiece.movePiece(this));
         this.movedPiece.switchFirstMove();
-        builder.setNextTurn(!builder.thisTurn);
+        builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
         return builder.build();
     }
 
@@ -175,11 +175,21 @@ public abstract class Move {
             public boolean isDone() {
                 return true;
             }
+
+            @Override
+            public boolean isIllegal() {
+                return false;
+            }
         },
         ILLEGAL_MOVE {
             @Override
             public boolean isDone() {
                 return false;
+            }
+
+            @Override
+            public boolean isIllegal() {
+                return true;
             }
         },
         DOES_SELF_CHECK {
@@ -187,9 +197,16 @@ public abstract class Move {
             public boolean isDone() {
                 return false;
             }
+
+            @Override
+            public boolean isIllegal() {
+                return false;
+            }
         };
 
         public abstract boolean isDone();
+
+        public abstract boolean isIllegal();
     }
 
     public static class moveMaker{
