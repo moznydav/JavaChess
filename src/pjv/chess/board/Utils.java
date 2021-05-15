@@ -11,10 +11,10 @@ public enum Utils {;
     public static int FURTHER_ROOK_DISTANCE = 4;
 
     public static int getColumnNumber(int piecePosition){
-        return piecePosition % 8;
+        return piecePosition % 8 + 1;
     }
     public static int getRowNumber(int piecePosition){
-        return piecePosition / 8;
+        return piecePosition / 8 + 1;
     }
 
     public static boolean isValidCoordinate(int coordinate){
