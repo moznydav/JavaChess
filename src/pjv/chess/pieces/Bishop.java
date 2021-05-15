@@ -48,6 +48,17 @@ public class Bishop extends ChessPiece{
     @Override
     public String toString(){ return "B"; }
 
+    @Override
+    public boolean isKing(){
+        return false;
+    }
+
+    @Override
+    public ChessPiece movePiece(Move move) {
+
+        return new Bishop(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
+    }
+
     private boolean isOverEdgeMove(int piecePosition, int offset){
 
         int columnNumber = Utils.getColumnNumber(piecePosition);

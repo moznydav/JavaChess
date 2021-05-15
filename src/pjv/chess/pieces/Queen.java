@@ -47,6 +47,17 @@ public class Queen extends ChessPiece{
     @Override
     public String toString(){ return "Q"; }
 
+    @Override
+    public boolean isKing(){
+        return false;
+    }
+
+    @Override
+    public ChessPiece movePiece(Move move) {
+
+        return new Queen(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
+    }
+
     private boolean isOverEdgeMove(int piecePosition, int offset){
 
         int columnNumber = Utils.getColumnNumber(piecePosition);

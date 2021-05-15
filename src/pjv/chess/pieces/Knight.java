@@ -44,6 +44,16 @@ public class Knight extends ChessPiece{
     @Override
     public String toString(){ return "N"; }
 
+    @Override
+    public boolean isKing(){
+        return false;
+    }
+
+    @Override
+    public ChessPiece movePiece(Move move) {
+
+        return new Knight(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
+    }
 
     private boolean isOverEdgeMove(int piecePosition, int offset){
 

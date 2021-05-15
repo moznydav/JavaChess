@@ -47,6 +47,17 @@ public class King extends ChessPiece{
     @Override
     public String toString(){ return "K"; }
 
+    @Override
+    public boolean isKing(){
+        return true;
+    }
+
+    @Override
+    public ChessPiece movePiece(Move move) {
+
+        return new King(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
+    }
+
     private boolean isOverEdgeMove(int piecePosition, int offset){
 
         int columnNumber = Utils.getColumnNumber(piecePosition);
@@ -64,4 +75,5 @@ public class King extends ChessPiece{
         }
         return false;
     }
+
 }

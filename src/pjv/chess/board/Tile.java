@@ -40,6 +40,8 @@ public abstract class Tile {
 
     public abstract ChessPiece getPiece();
 
+    public int getTileCoordinates(){ return this.tileCoord;}
+
 
     public static class EmptyTile extends Tile{
 
