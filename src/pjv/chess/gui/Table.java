@@ -197,7 +197,6 @@ public class Table {
                                 final Move move = Move.moveMaker.createMove(chessBoard, sourceTile.getTileCoordinates(), destinationTile.getTileCoordinates());
                                 final BoardTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
                                 if(transition.getMoveStatus().isDone()){
-                                    System.out.println("I made it here");
                                     chessBoard = transition.getNewBoard();
                                     //TODO add move to move log for PGN save
                                 }

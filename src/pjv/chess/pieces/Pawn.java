@@ -41,8 +41,9 @@ public class Pawn extends ChessPiece{
                         break;
                     case 16:
                         if (destinationTile.isEmpty() &&
-                                board.getTile(destinationCoordinate - offsetCoefficient * currentOffset).isEmpty() &&
-                                Utils.getRowNumber(this.piecePosition) + HALFPOINT * offsetCoefficient == HALF_OF_ROWS) {
+                                board.getTile(destinationCoordinate).isEmpty() &&
+                                ((Utils.getRowNumber(this.piecePosition) == 2 && !this.alliance) || //is black and is in 2nd row
+                                        (Utils.getRowNumber(this.piecePosition) == 7 && this.alliance))) { //is white and is in 7th row
                             legalMoves.add(new Move.DefaultMove(board, this, destinationCoordinate));
                         }
                         break;
@@ -85,12 +86,6 @@ public class Pawn extends ChessPiece{
     }
 
 }
-
-
-
-
-
-
 
 
 
