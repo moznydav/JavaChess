@@ -28,9 +28,9 @@ public class Pawn extends ChessPiece{
 
         for (int currentOffset : MOVE_OFFSETS) {
             int destinationCoordinate = this.piecePosition + offsetCoefficient * currentOffset;
-            Tile destinationTile = board.getTile(destinationCoordinate);
 
             if (Utils.isValidCoordinate(destinationCoordinate)) {
+                Tile destinationTile = board.getTile(destinationCoordinate);
                 ChessPiece pieceAtDestination;
                 switch (currentOffset) {
                     case 8:
@@ -55,7 +55,6 @@ public class Pawn extends ChessPiece{
                                 legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
                             }
                         } else if(board.getEnPassantPawn() != null){
-                            System.out.println(destinationCoordinate - (8 * offsetCoefficient));
                             if (board.getEnPassantPawn().getPiecePosition() == destinationCoordinate - (8 * offsetCoefficient) &&
                                     destinationTile.isEmpty() && board.getEnPassantPawn().getPieceAlliance() != this.alliance){
                                 legalMoves.add(new Move.PawnEnPassant(board, this, destinationCoordinate, board.getEnPassantPawn()));
@@ -71,13 +70,15 @@ public class Pawn extends ChessPiece{
                                 legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
                             }
                         } else if(board.getEnPassantPawn() != null){
-                            System.out.println(destinationCoordinate - (8 * offsetCoefficient));
                             if (board.getEnPassantPawn().getPiecePosition() == destinationCoordinate - (8 * offsetCoefficient) &&
                                     destinationTile.isEmpty() && board.getEnPassantPawn().getPieceAlliance() != this.alliance){
                                 legalMoves.add(new Move.PawnEnPassant(board, this, destinationCoordinate, board.getEnPassantPawn()));
                             }
                         }
                         break;
+                }
+                if(Utils.getRowNumber(this.piecePosition) == 7 && !this.alliance){
+                    System.out.println("Pawn is on tile: " + this.piecePosition);
                 }
             }
         }
