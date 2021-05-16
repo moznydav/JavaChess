@@ -94,7 +94,37 @@ public abstract class Move {
         }
     }
 
-    public static class PawnJump extends Move{
+    public static class PawnPromotion extends PawnMove{
+
+        Move pawnMove;
+        Pawn promotedPawn;
+
+        public PawnPromotion(Move pawnMove) {
+            super(pawnMove.getBoard() , pawnMove.getMovedPiece(), pawnMove.getDestinationCoordinate());
+            this.pawnMove = pawnMove;
+            this.promotedPawn = (Pawn) pawnMove.getMovedPiece();
+        }
+
+        @Override
+        public Board moveExecution(){
+
+            Board newBoard = this.pawnMove.moveExecution();
+            Board.Builder builder = new Board.Builder();
+            for(ChessPiece piece : newBoard.getCurrentPlayer().getMyPieces()){
+                if(!this.promotedPawn.equals((piece))){
+                    builder.setPiece(piece);
+                }
+            }
+            for(final ChessPiece piece : newBoard.getCurrentPlayer().getOpponentsPieces()){
+                builder.setPiece(piece);
+            }
+            builder.setPiece(this.promotedPawn.getPromotedPiece().movePiece(this));
+            builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
+            return builder.build();
+        }
+    }
+
+    public static class PawnJump extends PawnMove{
 
         public PawnJump(Board board, ChessPiece movedPiece, int pieceDestination) {
             super(board, movedPiece, pieceDestination);
@@ -196,6 +226,8 @@ public abstract class Move {
     }
 
     public ChessPiece getMovedPiece(){ return this.movedPiece; }
+
+    public Board getBoard(){ return this.board; }
 
     public boolean isAttack(){ return false; }
 

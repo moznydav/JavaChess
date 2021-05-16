@@ -35,8 +35,10 @@ public class Pawn extends ChessPiece{
                 switch (currentOffset) {
                     case 8:
                         if (destinationTile.isEmpty()) {
-                            //TODO possible promotion
                             legalMoves.add(new Move.DefaultMove(board, this, destinationCoordinate));
+                            if(isPromotionSquare(destinationCoordinate, this)){
+                                legalMoves.add(new Move.PawnPromotion(new Move.DefaultMove(board, this, destinationCoordinate)));
+                            }
                         }
                         break;
                     case 16:
@@ -52,7 +54,11 @@ public class Pawn extends ChessPiece{
                         if(!destinationTile.isEmpty() && pieceAtDestination.alliance != this.alliance){
                             if((this.alliance && Utils.getColumnNumber(this.piecePosition) != 8) || /*is white*/
                                     (!this.alliance && Utils.getColumnNumber(this.piecePosition) != 1) /*is black*/){
-                                legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
+                                if(isPromotionSquare(destinationCoordinate, this)){
+                                    legalMoves.add(new Move.PawnPromotion(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination)));
+                                } else {
+                                    legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
+                                }
                             }
                         } else if(board.getEnPassantPawn() != null){
                             if (board.getEnPassantPawn().getPiecePosition() == destinationCoordinate - (8 * offsetCoefficient) &&
@@ -67,7 +73,11 @@ public class Pawn extends ChessPiece{
                         if(!destinationTile.isEmpty() && pieceAtDestination.alliance != this.alliance){
                             if((this.alliance && Utils.getColumnNumber(this.piecePosition) != 1) || /*is white*/
                                     (!this.alliance && Utils.getColumnNumber(this.piecePosition) != 8) /*is black*/){
-                                legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
+                                if(isPromotionSquare(destinationCoordinate, this)){
+                                    legalMoves.add(new Move.PawnPromotion(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination)));
+                                } else {
+                                    legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
+                                }
                             }
                         } else if(board.getEnPassantPawn() != null){
                             if (board.getEnPassantPawn().getPiecePosition() == destinationCoordinate - (8 * offsetCoefficient) &&
@@ -96,6 +106,17 @@ public class Pawn extends ChessPiece{
     public ChessPiece movePiece(Move move) {
 
         return new Pawn(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
+    }
+
+    private boolean isPromotionSquare(int tileCoordinate, ChessPiece piece){
+        if((Utils.getRowNumber(tileCoordinate) == 1 && piece.alliance) ||
+                (Utils.getRowNumber(tileCoordinate) == 8 && !piece.alliance)){
+            return true;
+        } else { return false; }
+    }
+
+    public ChessPiece getPromotedPiece(){
+        return new Queen(this.piecePosition, this.getPieceAlliance());
     }
 
 }
