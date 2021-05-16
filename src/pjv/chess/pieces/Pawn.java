@@ -44,7 +44,7 @@ public class Pawn extends ChessPiece{
                                 board.getTile(destinationCoordinate).isEmpty() &&
                                 ((Utils.getRowNumber(this.piecePosition) == 2 && !this.alliance) || //is black and is in 2nd row
                                         (Utils.getRowNumber(this.piecePosition) == 7 && this.alliance))) { //is white and is in 7th row
-                            legalMoves.add(new Move.DefaultMove(board, this, destinationCoordinate));
+                            legalMoves.add(new Move.PawnJump(board, this, destinationCoordinate));
                         }
                         break;
                     case 7:
@@ -53,6 +53,12 @@ public class Pawn extends ChessPiece{
                             if((this.alliance && Utils.getColumnNumber(this.piecePosition) != 8) || /*is white*/
                                     (!this.alliance && Utils.getColumnNumber(this.piecePosition) != 1) /*is black*/){
                                 legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
+                            }
+                        } else if(board.getEnPassantPawn() != null){
+                            System.out.println(destinationCoordinate - (8 * offsetCoefficient));
+                            if (board.getEnPassantPawn().getPiecePosition() == destinationCoordinate - (8 * offsetCoefficient) &&
+                                    destinationTile.isEmpty() && board.getEnPassantPawn().getPieceAlliance() != this.alliance){
+                                legalMoves.add(new Move.PawnEnPassant(board, this, destinationCoordinate, board.getEnPassantPawn()));
                             }
                         }
                         break;
@@ -63,6 +69,12 @@ public class Pawn extends ChessPiece{
                             if((this.alliance && Utils.getColumnNumber(this.piecePosition) != 1) || /*is white*/
                                     (!this.alliance && Utils.getColumnNumber(this.piecePosition) != 8) /*is black*/){
                                 legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
+                            }
+                        } else if(board.getEnPassantPawn() != null){
+                            System.out.println(destinationCoordinate - (8 * offsetCoefficient));
+                            if (board.getEnPassantPawn().getPiecePosition() == destinationCoordinate - (8 * offsetCoefficient) &&
+                                    destinationTile.isEmpty() && board.getEnPassantPawn().getPieceAlliance() != this.alliance){
+                                legalMoves.add(new Move.PawnEnPassant(board, this, destinationCoordinate, board.getEnPassantPawn()));
                             }
                         }
                         break;

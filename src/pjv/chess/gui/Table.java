@@ -193,7 +193,6 @@ public class Table {
                         } else {
                             destinationTile = chessBoard.getTile(tileID);
                             if(sourceTile.getTileCoordinates() == destinationTile.getTileCoordinates()){
-
                                 clearSelection();
                             } else {
                                 System.out.println("Destination selected" + destinationTile.getTileCoordinates());

@@ -1,6 +1,7 @@
 package pjv.chess.board;
 
 import pjv.chess.pieces.ChessPiece;
+import pjv.chess.pieces.Pawn;
 import pjv.chess.pieces.Rook;
 
 public abstract class Move {
@@ -63,6 +64,26 @@ public abstract class Move {
             super(board, movedPiece, pieceDestination);
             this.attackedPiece = attackedPiece;
         }
+        @Override
+        public Board moveExecution(){
+            Board.Builder builder = new Board.Builder();
+
+            for(ChessPiece piece : this.board.getCurrentPlayer().getMyPieces()){
+                if(!this.movedPiece.equals(piece)){
+                    builder.setPiece(piece);
+                }
+            }
+
+            for(ChessPiece piece : this.board.getCurrentPlayer().getOpponent().getMyPieces()){
+                if(!piece.equals(this.attackedPiece)){
+                    builder.setPiece(piece);
+                }
+            }
+            builder.setPiece(this.movedPiece.movePiece(this));
+            this.movedPiece.switchFirstMove();
+            builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
+            return builder.build();
+        }
 
     }
 
@@ -75,32 +96,45 @@ public abstract class Move {
 
     public static class PawnJump extends Move{
 
-        PawnJump(Board board, ChessPiece movedPiece, int pieceDestination) {
+        public PawnJump(Board board, ChessPiece movedPiece, int pieceDestination) {
             super(board, movedPiece, pieceDestination);
+        }
+        @Override
+        public Board moveExecution(){
+            Board.Builder builder = new Board.Builder();
+
+            for(ChessPiece piece : this.board.getCurrentPlayer().getMyPieces()){
+                if(!this.movedPiece.equals(piece)){
+                    builder.setPiece(piece);
+                }
+            }
+
+            for(ChessPiece piece : this.board.getCurrentPlayer().getOpponent().getMyPieces()){
+                builder.setPiece(piece);
+            }
+            Pawn movedPawn = (Pawn)this.movedPiece.movePiece(this);
+            builder.setPiece(movedPawn);
+            builder.setEnPassantPawn(movedPawn);
+            this.movedPiece.switchFirstMove();
+            builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
+            return builder.build();
         }
     }
 
-    public static class PawnEnPassant extends PawnAttackMove{
+    public static class PawnEnPassant extends AttackMove{
 
         public PawnEnPassant(Board board, ChessPiece movedPiece, int pieceDestination, ChessPiece attackedPiece) {
             super(board, movedPiece, pieceDestination, attackedPiece);
         }
     }
 
-    public static class PawnAttackMove extends AttackMove{
-
-        public PawnAttackMove(Board board, ChessPiece movedPiece, int pieceDestination, ChessPiece attackedPiece) {
-            super(board, movedPiece, pieceDestination, attackedPiece);
-        }
-    }
-
-    public static class CasteMove extends Move {
+   static abstract class CastleMove extends Move {
         Rook castleRook;
         int castleRookPosition;
         int casteRookDestination;
 
-        CasteMove(Board board, ChessPiece movedPiece, int pieceDestination,
-                  Rook castleRook, int castleRookPosition, int casteRookDestination) {
+        public CastleMove(Board board, ChessPiece movedPiece, int pieceDestination,
+                          Rook castleRook, int castleRookPosition, int casteRookDestination) {
             super(board, movedPiece, pieceDestination);
             this.castleRook = castleRook;
             this.castleRookPosition = castleRookPosition;
@@ -136,15 +170,15 @@ public abstract class Move {
         }
     }
 
-    public static class ShortCasteMove extends CasteMove{
+    public static class ShortCastleMove extends CastleMove {
 
-        public ShortCasteMove(Board board, ChessPiece movedPiece, int pieceDestination,
-                              Rook castleRook, int castleRookPosition, int casteRookDestination) {
+        public ShortCastleMove(Board board, ChessPiece movedPiece, int pieceDestination,
+                               Rook castleRook, int castleRookPosition, int casteRookDestination) {
             super(board, movedPiece, pieceDestination, castleRook, castleRookPosition, casteRookDestination);
         }
     }
 
-    public static class LongCastleMove extends CasteMove{
+    public static class LongCastleMove extends CastleMove {
 
         public LongCastleMove(Board board, ChessPiece movedPiece, int pieceDestination,
                               Rook castleRook, int castleRookPosition, int casteRookDestination) {

@@ -17,10 +17,13 @@ public class Board {
     private Player blackPlayer;
     private Player currentPlayer;
 
+    private Pawn enPassantPawn;
+
     private Board(Builder builder) {
         this.chessBoard = createChessBoard(builder);
         this.whitePieces = countActivePieces(this.chessBoard,true);
         this.blackPieces = countActivePieces(this.chessBoard, false);
+        this.enPassantPawn = builder.enPassantPawn;
 
         List<Move> whiteLegalMoves = calculateLegalMoves(this.whitePieces);
         List<Move> blackLegalMoves = calculateLegalMoves(this.blackPieces);
@@ -62,6 +65,8 @@ public class Board {
     }
 
     public Player getCurrentPlayer(){ return this.currentPlayer; }
+
+    public Pawn getEnPassantPawn(){ return this.enPassantPawn; }
 
     public Collection<Move> getAllLegalMoves(){
 
@@ -157,11 +162,17 @@ public class Board {
         }
         return builder.toString();
     }
+    public void printAllLegalMovesOfPiece(Tile tile){
+        for(Move move : tile.getPiece().calculateAllLegalMoves(this)){
+            System.out.println(tile.getPiece() + "'s legal move is on tile " + move.getDestinationCoordinate());
+        }
+    }
 
     public static class Builder{
 
         Map<Integer, ChessPiece> boardConfig;
         boolean thisTurn;
+        Pawn enPassantPawn;
 
         public Builder(){
             this.boardConfig = new HashMap<>();
@@ -183,6 +194,10 @@ public class Board {
 
         public Board build(){
             return new Board(this);
+        }
+
+        public void setEnPassantPawn(Pawn movedPawn) {
+            this.enPassantPawn = movedPawn;
         }
     }
 }
