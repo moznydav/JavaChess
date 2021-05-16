@@ -22,6 +22,8 @@ public class Table {
 
     private JFrame gameFrame;
     private BoardTablePanel boardTablePanel;
+    private ChessClockPanelAbove chessClockPanelAbove;
+    private ChessClockPanelBellow chessClockPanelBellow;
     private Board chessBoard;
 
     private Tile sourceTile;
@@ -30,8 +32,8 @@ public class Table {
 
     //Both height and width of Board table panel dimension should be divisible by ROW_COUNT and COLUMN_COUNT so tiles will be clean
     //TODO make Table and BoardTable dependant on Tile dimension not vice versa
-    private static int FRAME_WIDTH = 800;
-    private static int FRAME_HEIGHT = 800;
+    private static int FRAME_WIDTH = 1000;
+    private static int FRAME_HEIGHT = 1000;
 
     private static int BOARD_TO_FRAME_DIFFERENCE = 200;
     private static int BOARD_WIDTH = FRAME_WIDTH - BOARD_TO_FRAME_DIFFERENCE;
@@ -58,13 +60,19 @@ public class Table {
         this.gameFrame.setJMenuBar(menuBar);
 
         this.gameFrame.setSize(FRAME_DIMENSION);
+
         this.boardTablePanel = new BoardTablePanel();
+        this.chessClockPanelAbove = new ChessClockPanelAbove();
+        this.chessClockPanelBellow = new ChessClockPanelBellow();
+
         this.gameFrame.add(this.boardTablePanel, BorderLayout.CENTER);
+        this.gameFrame.add(this.chessClockPanelAbove, BorderLayout.NORTH);
+        this.gameFrame.add(this.chessClockPanelBellow, BorderLayout.SOUTH);
 
         this.gameFrame.setVisible(true);
         this.chessBoard.getCurrentPlayer().getChessClock().run();
         this.chessBoard.getCurrentPlayer().getOpponent().getChessClock().run();
-        //this.chessBoard.getCurrentPlayer().getOpponent().getChessClock().pause();
+        this.chessBoard.getCurrentPlayer().getOpponent().getChessClock().pause();
     }
 
     private JMenuBar createMenuBar() {

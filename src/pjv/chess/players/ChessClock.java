@@ -5,8 +5,6 @@ public class ChessClock implements Runnable{
     private static int DEFAULT_TIME = 300;
 
     int timeLeft = 300;
-    int minutesShown = timeLeft / 60;
-    int secondsShown = timeLeft % 60;
     private volatile boolean isPaused = false;
 
 
@@ -24,8 +22,6 @@ public class ChessClock implements Runnable{
             }
         }
     }
-
-
     public void pause() {
         isPaused = true;
     }
@@ -33,6 +29,8 @@ public class ChessClock implements Runnable{
     public void resume() {
         isPaused = false;
     }
+
+    public int getTimeLeft(){ return timeLeft;}
 }
 
 
