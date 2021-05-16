@@ -32,6 +32,7 @@ public abstract class Move {
         }
         builder.setPiece(this.movedPiece.movePiece(this));
         this.movedPiece.switchFirstMove();
+        flipChessClock();
         builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
         return builder.build();
     }
@@ -81,6 +82,7 @@ public abstract class Move {
             }
             builder.setPiece(this.movedPiece.movePiece(this));
             this.movedPiece.switchFirstMove();
+            flipChessClock();
             builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
             return builder.build();
         }
@@ -119,6 +121,7 @@ public abstract class Move {
                 builder.setPiece(piece);
             }
             builder.setPiece(this.promotedPawn.getPromotedPiece().movePiece(this));
+            flipChessClock();
             builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
             return builder.build();
         }
@@ -146,6 +149,7 @@ public abstract class Move {
             builder.setPiece(movedPawn);
             builder.setEnPassantPawn(movedPawn);
             this.movedPiece.switchFirstMove();
+            flipChessClock();
             builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
             return builder.build();
         }
@@ -193,6 +197,7 @@ public abstract class Move {
             builder.setPiece(this.movedPiece.movePiece(this));
             builder.setPiece(new Rook(this.castleRook.getPiecePosition(), this.castleRook.getPieceAlliance()));
             this.movedPiece.switchFirstMove();
+            flipChessClock();
             builder.setNextTurn(!builder.thisTurn);
             return builder.build();
 
@@ -232,6 +237,12 @@ public abstract class Move {
     public boolean isAttack(){ return false; }
 
     public boolean isCastlingMove(){ return false; }
+
+    public void flipChessClock(){
+        System.out.println("This happened");
+        board.getCurrentPlayer().getChessClock().pause();
+        board.getCurrentPlayer().getOpponent().getChessClock().resume();
+    }
 
 
     public enum MoveStatus {

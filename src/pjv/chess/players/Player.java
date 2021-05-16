@@ -16,6 +16,8 @@ public class Player {
     Collection<Move> myMoves;
     Collection<Move> opponentsMoves;
 
+    ChessClock chessClock;
+
 
     public Player(Board board, boolean alliance, Collection<Move> whiteLegalMoves, Collection<Move> blackLegalMoves) {
 
@@ -24,11 +26,15 @@ public class Player {
         this.alliance = alliance;
         this.myMoves = alliance ? whiteLegalMoves : blackLegalMoves;
         this.opponentsMoves = !alliance ? whiteLegalMoves : blackLegalMoves;
+
+        this.chessClock = new ChessClock();
+
+
         if(myMoves.addAll(calculateCastleMoves(myMoves, opponentsMoves, alliance))){
-            System.out.println("Added even more successfully");
+            //System.out.println("Added even more successfully");
         };
-        board.printAllLegalMovesOfPiece(board.getTile(Utils.WHITE_KING_POSITION));
-        board.printAllLegalMovesOfPiece(board.getTile(Utils.BLACK_KING_POSITION));
+        //board.printAllLegalMovesOfPiece(board.getTile(Utils.WHITE_KING_POSITION));
+        //board.printAllLegalMovesOfPiece(board.getTile(Utils.BLACK_KING_POSITION));
     }
 
     private King setupKing() {
@@ -58,6 +64,8 @@ public class Player {
 
     public boolean getAlliance(){ return this.alliance; }
 
+    public ChessClock getChessClock(){ return this.chessClock; }
+
     Collection<Move> calculateCastleMoves(Collection<Move> playerLegalMoves, Collection<Move> opponentLegalMoves, boolean alliance){ //white = true;
         Collection<Move> kingCastleMoves = new ArrayList<>();
         int kingsPosition = alliance ? Utils.WHITE_KING_POSITION : Utils.BLACK_KING_POSITION;
@@ -68,20 +76,20 @@ public class Player {
             if(!closerRookTile.isEmpty() && closerRookTile.getPiece().isFirstMove()){
                 if(isLegalForCastling(this.board.getTile(kingsPosition + Utils.CLOSER_ROOK_DISTANCE-2) , opponentLegalMoves) &&
                         isLegalForCastling(this.board.getTile(kingsPosition + Utils.CLOSER_ROOK_DISTANCE-1) , opponentLegalMoves)){
-                    System.out.println("I got here - short castle");
+                    //System.out.println("I got here - short castle");
                     if(kingCastleMoves.add(new Move.ShortCastleMove(this.board, this.playerKing, kingsPosition +Utils.CLOSER_ROOK_DISTANCE-1,
                             (Rook) closerRookTile.getPiece(), closerRookTile.getTileCoordinates(), closerRookTile.getTileCoordinates()-Utils.CLOSER_ROOK_DISTANCE+1))){
-                        System.out.println("Added successfully");
+                        //System.out.println("Added successfully");
                     };
                 }
 
             } if (!furtherRookTile.isEmpty() && furtherRookTile.getPiece().isFirstMove()){
                 if(isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+2) , opponentLegalMoves) &&
                         isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+1) , opponentLegalMoves)){
-                    System.out.println("I got here - long castle");
+                    //System.out.println("I got here - long castle");
                     if(kingCastleMoves.add(new Move.LongCastleMove(this.board, this.playerKing, kingsPosition -Utils.FURTHER_ROOK_DISTANCE+2,
                         (Rook) closerRookTile.getPiece(), closerRookTile.getTileCoordinates(), closerRookTile.getTileCoordinates()+Utils.FURTHER_ROOK_DISTANCE-1))){
-                        System.out.println("Added successfully");
+                        //System.out.println("Added successfully");
                     };
                 }
             }

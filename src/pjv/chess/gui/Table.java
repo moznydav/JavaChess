@@ -50,6 +50,7 @@ public class Table {
 
     public Table(){
         this.chessBoard = Board.createStandardBoard();
+
         this.gameFrame = new JFrame("Chess");
         this.gameFrame.setLayout(new BorderLayout());
 
@@ -61,6 +62,9 @@ public class Table {
         this.gameFrame.add(this.boardTablePanel, BorderLayout.CENTER);
 
         this.gameFrame.setVisible(true);
+        this.chessBoard.getCurrentPlayer().getChessClock().run();
+        this.chessBoard.getCurrentPlayer().getOpponent().getChessClock().run();
+        //this.chessBoard.getCurrentPlayer().getOpponent().getChessClock().pause();
     }
 
     private JMenuBar createMenuBar() {
