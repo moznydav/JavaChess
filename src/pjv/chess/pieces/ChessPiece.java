@@ -3,6 +3,7 @@ package pjv.chess.pieces;
 import pjv.chess.board.Board;
 import pjv.chess.board.Move;
 
+import java.util.Collection;
 import java.util.List;
 
 public abstract class ChessPiece {
@@ -10,8 +11,6 @@ public abstract class ChessPiece {
     int piecePosition;
     boolean alliance; //true = white, false = black
     boolean isFirstMove = true; //because of castling and pawn jump
-
-
 
     ChessPiece(int piecePosition, boolean alliance){
         this.piecePosition = piecePosition;

@@ -24,10 +24,8 @@ public abstract class Tile {
 
     public static Tile createTile(int tileCoord, ChessPiece piece){
         if(piece != null){
-            //System.out.println("Tile with piece created.\n");
             return new OccupiedTile(tileCoord, piece);
         } else {
-            //System.out.println("Empty tile created.\n");
             return EMPTY_TILES.get(tileCoord);
         }
     }
