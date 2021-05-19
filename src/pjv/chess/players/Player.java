@@ -8,27 +8,30 @@ import pjv.chess.pieces.Rook;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Player {
+    private static int DEFAULT_TIME = 300;
+    private static int DEFAULT_INCREMENT = 100;
+
     Board board;
     King playerKing;
     boolean alliance;
     Collection<Move> myMoves;
     Collection<Move> opponentsMoves;
-
     ChessClock chessClock;
 
 
-    public Player(Board board, boolean alliance, Collection<Move> whiteLegalMoves, Collection<Move> blackLegalMoves) {
+    public Player(Board board, boolean alliance, Collection<Move> whiteLegalMoves, Collection<Move> blackLegalMoves, int timeLeft) {
 
         this.board = board;
         this.playerKing = setupKing();
         this.alliance = alliance;
         this.myMoves = alliance ? whiteLegalMoves : blackLegalMoves;
         this.opponentsMoves = !alliance ? whiteLegalMoves : blackLegalMoves;
-
-        this.chessClock = new ChessClock();
-
+        this.chessClock = new ChessClock(timeLeft, this.alliance);
 
         if(myMoves.addAll(calculateCastleMoves(myMoves, opponentsMoves, alliance))){
             //System.out.println("Added even more successfully");
@@ -65,6 +68,9 @@ public class Player {
     public boolean getAlliance(){ return this.alliance; }
 
     public ChessClock getChessClock(){ return this.chessClock; }
+
+    public int getDefaultIncrement(){ return DEFAULT_INCREMENT; }
+
 
     Collection<Move> calculateCastleMoves(Collection<Move> playerLegalMoves, Collection<Move> opponentLegalMoves, boolean alliance){ //white = true;
         Collection<Move> kingCastleMoves = new ArrayList<>();
@@ -133,6 +139,16 @@ public class Player {
     }
     public boolean hasCastled(){
         return false;
+    }
+
+    public void startClock(){
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        //executor.schedule(this.chessClock, 0, TimeUnit.SECONDS);
+        executor.scheduleAtFixedRate(this.chessClock, 0, 1, TimeUnit.SECONDS);
+    }
+
+    public void stopClock(){
+        chessClock.requestStop();
     }
 
     public BoardTransition makeMove(Move move){

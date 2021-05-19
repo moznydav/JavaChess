@@ -31,7 +31,7 @@ public class ChessClockPanelBellow extends JPanel{
 
     public void update(ChessClock chessClock){
         chessClockPanel.removeAll();
-
+        //TODO
 
         validate();
     }

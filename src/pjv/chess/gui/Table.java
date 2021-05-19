@@ -61,6 +61,8 @@ public class Table {
 
         this.gameFrame.setSize(FRAME_DIMENSION);
 
+
+
         this.boardTablePanel = new BoardTablePanel();
         this.chessClockPanelAbove = new ChessClockPanelAbove();
         this.chessClockPanelBellow = new ChessClockPanelBellow();
@@ -70,9 +72,7 @@ public class Table {
         this.gameFrame.add(this.chessClockPanelBellow, BorderLayout.SOUTH);
 
         this.gameFrame.setVisible(true);
-        this.chessBoard.getCurrentPlayer().getChessClock().run();
-        this.chessBoard.getCurrentPlayer().getOpponent().getChessClock().run();
-        this.chessBoard.getCurrentPlayer().getOpponent().getChessClock().pause();
+
     }
 
     private JMenuBar createMenuBar() {

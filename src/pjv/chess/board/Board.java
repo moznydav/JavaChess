@@ -8,6 +8,8 @@ import javax.management.ImmutableDescriptor;
 import java.util.*;
 
 public class Board {
+    private static int DEFAULT_TIME = 300;
+    private static int DEFAULT_INCREMENT = 100;
 
     private List<Tile> chessBoard;
     Collection<ChessPiece> whitePieces;
@@ -16,6 +18,9 @@ public class Board {
     private Player whitePlayer;
     private Player blackPlayer;
     private Player currentPlayer;
+
+    public int whiteTime;
+    public int blackTime;
 
     private Pawn enPassantPawn;
 
@@ -29,10 +34,12 @@ public class Board {
         List<Move> blackLegalMoves = calculateLegalMoves(this.blackPieces);
 
         //boolean isWhitesTurn = true;
-
-        this.whitePlayer = new Player(this, true, whiteLegalMoves, blackLegalMoves);
-        this.blackPlayer = new Player(this, false, whiteLegalMoves, blackLegalMoves);
+        this.whiteTime = builder.whiteTime;
+        this.blackTime = builder.blackTime;
+        this.whitePlayer = new Player(this, true, whiteLegalMoves, blackLegalMoves, whiteTime);
+        this.blackPlayer = new Player(this, false, whiteLegalMoves, blackLegalMoves, blackTime);
         this.currentPlayer = builder.thisTurn ? this.whitePlayer : this.blackPlayer;
+        this.currentPlayer.startClock();
     }
 
     private List<ChessPiece> countActivePieces(List<Tile> chessBoard, boolean alliance){
@@ -119,7 +126,6 @@ public class Board {
         //*/
 
         //white pieces
-
         builder.setPiece(new Rook(56,true));
         builder.setPiece(new Knight(57,true));
         builder.setPiece(new Bishop(58,true));
@@ -140,6 +146,8 @@ public class Board {
 
         //white has the first move
         builder.setNextTurn(true);
+        builder.keepWhiteTime(DEFAULT_TIME);
+        builder.keepBlackTime(DEFAULT_TIME - DEFAULT_INCREMENT);
 
         return builder.build();
     }
@@ -149,9 +157,13 @@ public class Board {
         return chessBoard.get(tileCoord);
     }
 
+    public int getWhiteTime(){ return this.whiteTime; }
+
+    public int getBlackTime(){ return this.blackTime; }
+
 
     @Override
-    public String toString(){
+    public String toString(){ //used for debugging
         StringBuilder builder = new StringBuilder();
         for(int i = 0; i < Utils.TILE_COUNT; i++){
             String tileText = this.chessBoard.get(i).toString();
@@ -162,7 +174,7 @@ public class Board {
         }
         return builder.toString();
     }
-    public void printAllLegalMovesOfPiece(Tile tile){
+    public void printAllLegalMovesOfPiece(Tile tile){ //used for debugging
         for(Move move : tile.getPiece().calculateAllLegalMoves(this)){
             System.out.println(tile.getPiece() + "'s legal move is on tile " + move.getDestinationCoordinate());
         }
@@ -173,6 +185,9 @@ public class Board {
         Map<Integer, ChessPiece> boardConfig;
         boolean thisTurn;
         Pawn enPassantPawn;
+        private int whiteTime;
+        private int blackTime;
+
 
         public Builder(){
             this.boardConfig = new HashMap<>();
@@ -189,6 +204,16 @@ public class Board {
 
         public Builder setNextTurn(boolean nextTurn){ //true - white
             this.thisTurn = nextTurn;
+            return this;
+        }
+
+        public Builder keepWhiteTime(int time){
+            this.whiteTime = time;
+            return this;
+        }
+
+        public Builder keepBlackTime(int time){
+            this.blackTime = time;
             return this;
         }
 
