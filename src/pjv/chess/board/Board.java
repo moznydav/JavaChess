@@ -1,6 +1,7 @@
 package pjv.chess.board;
 
 import jdk.jshell.execution.Util;
+import pjv.chess.gui.PlayerPanel;
 import pjv.chess.pieces.*;
 import pjv.chess.players.Player;
 
@@ -9,7 +10,6 @@ import java.util.*;
 
 public class Board {
     private static int DEFAULT_TIME = 300;
-    private static int DEFAULT_INCREMENT = 100;
 
     private List<Tile> chessBoard;
     Collection<ChessPiece> whitePieces;
@@ -22,6 +22,9 @@ public class Board {
     public int whiteTime;
     public int blackTime;
 
+    public PlayerPanel whitePlayerPanel;
+    public PlayerPanel blackPlayerPanel;
+
     private Pawn enPassantPawn;
 
     private Board(Builder builder) {
@@ -33,13 +36,21 @@ public class Board {
         List<Move> whiteLegalMoves = calculateLegalMoves(this.whitePieces);
         List<Move> blackLegalMoves = calculateLegalMoves(this.blackPieces);
 
+        this.whitePlayerPanel = whitePlayerPanel;
+        this.blackPlayerPanel = blackPlayerPanel;
+
         //boolean isWhitesTurn = true;
         this.whiteTime = builder.whiteTime;
         this.blackTime = builder.blackTime;
-        this.whitePlayer = new Player(this, true, whiteLegalMoves, blackLegalMoves, whiteTime);
-        this.blackPlayer = new Player(this, false, whiteLegalMoves, blackLegalMoves, blackTime);
+
+        this.whitePlayerPanel = builder.whitePlayerPanel;
+        this.blackPlayerPanel = builder.blackPlayerPanel;
+
+        this.whitePlayer = new Player(this, true, whiteLegalMoves, blackLegalMoves, whiteTime, whitePlayerPanel);
+        this.blackPlayer = new Player(this, false, whiteLegalMoves, blackLegalMoves, blackTime, blackPlayerPanel);
         this.currentPlayer = builder.thisTurn ? this.whitePlayer : this.blackPlayer;
         this.currentPlayer.startClock();
+
     }
 
     private List<ChessPiece> countActivePieces(List<Tile> chessBoard, boolean alliance){
@@ -147,7 +158,9 @@ public class Board {
         //white has the first move
         builder.setNextTurn(true);
         builder.keepWhiteTime(DEFAULT_TIME);
-        builder.keepBlackTime(DEFAULT_TIME - DEFAULT_INCREMENT);
+        builder.keepBlackTime(DEFAULT_TIME);
+        builder.keepWhitePlayerPanel(new PlayerPanel(true));
+        builder.keepBlackPanel(new PlayerPanel(false));
 
         return builder.build();
     }
@@ -187,6 +200,8 @@ public class Board {
         Pawn enPassantPawn;
         private int whiteTime;
         private int blackTime;
+        private PlayerPanel whitePlayerPanel;
+        private PlayerPanel blackPlayerPanel;
 
 
         public Builder(){
@@ -204,6 +219,16 @@ public class Board {
 
         public Builder setNextTurn(boolean nextTurn){ //true - white
             this.thisTurn = nextTurn;
+            return this;
+        }
+
+        public Builder keepWhitePlayerPanel(PlayerPanel whitePlayerPanel){
+            this.whitePlayerPanel = whitePlayerPanel;
+            return this;
+        }
+
+        public Builder keepBlackPanel(PlayerPanel blackPlayerPanel){
+            this.blackPlayerPanel = blackPlayerPanel;
             return this;
         }
 

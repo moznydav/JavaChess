@@ -1,10 +1,12 @@
 package pjv.chess.players;
 
 import pjv.chess.board.*;
+import pjv.chess.gui.PlayerPanel;
 import pjv.chess.pieces.ChessPiece;
 import pjv.chess.pieces.King;
 import pjv.chess.pieces.Rook;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,24 +16,28 @@ import java.util.concurrent.TimeUnit;
 
 public class Player {
     private static int DEFAULT_TIME = 300;
-    private static int DEFAULT_INCREMENT = 100;
+    private static int DEFAULT_INCREMENT = 10;
 
     Board board;
     King playerKing;
     boolean alliance;
     Collection<Move> myMoves;
     Collection<Move> opponentsMoves;
+    int timeLeft;
     ChessClock chessClock;
+    PlayerPanel playerPanel;
 
 
-    public Player(Board board, boolean alliance, Collection<Move> whiteLegalMoves, Collection<Move> blackLegalMoves, int timeLeft) {
+    public Player(Board board, boolean alliance, Collection<Move> whiteLegalMoves, Collection<Move> blackLegalMoves, int timeLeft, PlayerPanel playerPanel) {
 
         this.board = board;
         this.playerKing = setupKing();
         this.alliance = alliance;
         this.myMoves = alliance ? whiteLegalMoves : blackLegalMoves;
         this.opponentsMoves = !alliance ? whiteLegalMoves : blackLegalMoves;
-        this.chessClock = new ChessClock(timeLeft, this.alliance);
+        this.playerPanel = playerPanel;
+        this.timeLeft = timeLeft;
+        this.chessClock = new ChessClock(timeLeft, this.alliance, this.playerPanel);
 
         if(myMoves.addAll(calculateCastleMoves(myMoves, opponentsMoves, alliance))){
             //System.out.println("Added even more successfully");
@@ -48,6 +54,8 @@ public class Player {
         }
         throw new RuntimeException("Invalid board, player has no King");
     }
+
+    //all getters
 
     public Collection<ChessPiece> getMyPieces() {
         return this.alliance ? this.board.getWhitePieces() : this.board.getBlackPieces();
@@ -69,7 +77,15 @@ public class Player {
 
     public ChessClock getChessClock(){ return this.chessClock; }
 
+    public int getDefaultTime(){ return DEFAULT_TIME; }
+
     public int getDefaultIncrement(){ return DEFAULT_INCREMENT; }
+
+    public PlayerPanel getPlayerPanel(){ return this.playerPanel;}
+
+    public void setPlayerPanel(PlayerPanel playerPanel){
+        this.playerPanel = playerPanel;
+    }
 
 
     Collection<Move> calculateCastleMoves(Collection<Move> playerLegalMoves, Collection<Move> opponentLegalMoves, boolean alliance){ //white = true;
@@ -148,7 +164,8 @@ public class Player {
     }
 
     public void stopClock(){
-        chessClock.requestStop();
+        this.chessClock.requestStop();
+        this.playerPanel.update(this.chessClock.getTimeLeft());
     }
 
     public BoardTransition makeMove(Move move){
@@ -159,8 +176,8 @@ public class Player {
 
             Board newBoard = move.moveExecution();
 
-            Collection<Move> kingsAttacks = Player.calculateAttacksOnTile(newBoard.getCurrentPlayer().getOpponent().getPlayerKing().getPiecePosition(),
-                    newBoard.getCurrentPlayer().getMyMoves());
+            Collection<Move> kingsAttacks = Player.calculateAttacksOnTile(newBoard.getCurrentPlayer().getPlayerKing().getPiecePosition(),
+                    newBoard.getCurrentPlayer().getOpponent().getMyMoves());
 
             if(!kingsAttacks.isEmpty()){ //king is in check
                 return new BoardTransition(this.board, move, Move.MoveStatus.DOES_SELF_CHECK);

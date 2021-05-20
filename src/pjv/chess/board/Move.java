@@ -201,8 +201,6 @@ public abstract class Move {
             this.board.getCurrentPlayer().stopClock();
             endTurn(builder);
             return builder.build();
-
-
         }
     }
 
@@ -242,13 +240,16 @@ public abstract class Move {
     public void endTurn(Board.Builder builder){
 
         if(board.getCurrentPlayer().getAlliance()){
-            builder.keepWhiteTime(board.getWhitePlayer().getChessClock().getTimeLeft());
-            builder.keepBlackTime(board.getBlackPlayer().getChessClock().getTimeLeft() + board.getBlackPlayer().getDefaultIncrement());
-        } else {
             builder.keepWhiteTime(board.getWhitePlayer().getChessClock().getTimeLeft() + board.getWhitePlayer().getDefaultIncrement());
-            builder.keepBlackTime(board.getBlackPlayer().getChessClock().getTimeLeft());
+            builder.keepBlackTime(board.getBlackPlayer().getChessClock().getTimeLeft() );
+            board.getWhitePlayer().getPlayerPanel().update(board.getWhitePlayer().getChessClock().getTimeLeft() + board.getWhitePlayer().getDefaultIncrement());
+        } else {
+            builder.keepWhiteTime(board.getWhitePlayer().getChessClock().getTimeLeft() );
+            builder.keepBlackTime(board.getBlackPlayer().getChessClock().getTimeLeft() + board.getBlackPlayer().getDefaultIncrement());
+            board.getBlackPlayer().getPlayerPanel().update(board.getBlackPlayer().getChessClock().getTimeLeft() + board.getBlackPlayer().getDefaultIncrement());
         }
-
+        builder.keepWhitePlayerPanel(board.getWhitePlayer().getPlayerPanel());
+        builder.keepBlackPanel(board.getBlackPlayer().getPlayerPanel());
         builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
     }
 

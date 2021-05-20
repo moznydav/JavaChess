@@ -1,5 +1,7 @@
 package pjv.chess.players;
 
+import pjv.chess.gui.PlayerPanel;
+
 import javax.swing.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -8,14 +10,16 @@ import java.util.concurrent.TimeUnit;
 public class ChessClock implements Runnable{
 
     int timeLeft;
-    int increment;
     boolean alliance;
+    PlayerPanel playerPanel;
+
     private boolean stopRequested = false;
 
 
-    public ChessClock(int timeLeft, boolean alliance){
+    public ChessClock(int timeLeft, boolean alliance, PlayerPanel playerPanel){
         this.timeLeft = timeLeft;
         this.alliance = alliance;
+        this.playerPanel = playerPanel;
     }
 
     @Override
@@ -25,12 +29,10 @@ public class ChessClock implements Runnable{
             this.timeLeft -= 1;
 
             if(this.alliance){
-                System.out.println("White has " + this.timeLeft + " seconds left");
+                playerPanel.update(this.timeLeft);
             } else {
-
-                System.out.println("Black has " + this.timeLeft + " seconds left");
+                playerPanel.update(this.timeLeft);
             }
-
         }
     }
     public synchronized void requestStop(){
