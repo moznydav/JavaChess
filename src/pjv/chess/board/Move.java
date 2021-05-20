@@ -32,7 +32,8 @@ public abstract class Move {
         }
         builder.setPiece(this.movedPiece.movePiece(this));
         this.movedPiece.switchFirstMove();
-        builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
+        this.board.getCurrentPlayer().stopClock();
+        endTurn(builder);
         return builder.build();
     }
 
@@ -55,6 +56,7 @@ public abstract class Move {
             throw new RuntimeException("Null move is not executable");
         }
     }
+
 
     public static class AttackMove extends Move{
 
@@ -81,7 +83,8 @@ public abstract class Move {
             }
             builder.setPiece(this.movedPiece.movePiece(this));
             this.movedPiece.switchFirstMove();
-            builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
+            this.board.getCurrentPlayer().stopClock();
+            endTurn(builder);
             return builder.build();
         }
 
@@ -119,7 +122,8 @@ public abstract class Move {
                 builder.setPiece(piece);
             }
             builder.setPiece(this.promotedPawn.getPromotedPiece().movePiece(this));
-            builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
+            this.board.getCurrentPlayer().stopClock();
+            endTurn(builder);
             return builder.build();
         }
     }
@@ -146,7 +150,8 @@ public abstract class Move {
             builder.setPiece(movedPawn);
             builder.setEnPassantPawn(movedPawn);
             this.movedPiece.switchFirstMove();
-            builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
+            this.board.getCurrentPlayer().stopClock();
+            endTurn(builder);
             return builder.build();
         }
     }
@@ -193,10 +198,9 @@ public abstract class Move {
             builder.setPiece(this.movedPiece.movePiece(this));
             builder.setPiece(new Rook(this.castleRook.getPiecePosition(), this.castleRook.getPieceAlliance()));
             this.movedPiece.switchFirstMove();
-            builder.setNextTurn(!builder.thisTurn);
+            this.board.getCurrentPlayer().stopClock();
+            endTurn(builder);
             return builder.build();
-
-
         }
     }
 
@@ -233,6 +237,21 @@ public abstract class Move {
 
     public boolean isCastlingMove(){ return false; }
 
+    public void endTurn(Board.Builder builder){
+
+        if(board.getCurrentPlayer().getAlliance()){
+            builder.keepWhiteTime(board.getWhitePlayer().getChessClock().getTimeLeft() + board.getWhitePlayer().getDefaultIncrement());
+            builder.keepBlackTime(board.getBlackPlayer().getChessClock().getTimeLeft() );
+            board.getWhitePlayer().getPlayerPanel().update(board.getWhitePlayer().getChessClock().getTimeLeft() + board.getWhitePlayer().getDefaultIncrement());
+        } else {
+            builder.keepWhiteTime(board.getWhitePlayer().getChessClock().getTimeLeft() );
+            builder.keepBlackTime(board.getBlackPlayer().getChessClock().getTimeLeft() + board.getBlackPlayer().getDefaultIncrement());
+            board.getBlackPlayer().getPlayerPanel().update(board.getBlackPlayer().getChessClock().getTimeLeft() + board.getBlackPlayer().getDefaultIncrement());
+        }
+        builder.keepWhitePlayerPanel(board.getWhitePlayer().getPlayerPanel());
+        builder.keepBlackPanel(board.getBlackPlayer().getPlayerPanel());
+        builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
+    }
 
     public enum MoveStatus {
 

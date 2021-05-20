@@ -2,6 +2,7 @@ package pjv.chess.gui;
 
 import pjv.chess.board.*;
 import pjv.chess.pieces.ChessPiece;
+import pjv.chess.players.Player;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -22,6 +23,8 @@ public class Table {
 
     private JFrame gameFrame;
     private BoardTablePanel boardTablePanel;
+    private PlayerPanel blackPlayerPanel;
+    private PlayerPanel whitePlayerPanel;
     private Board chessBoard;
 
     private Tile sourceTile;
@@ -30,8 +33,8 @@ public class Table {
 
     //Both height and width of Board table panel dimension should be divisible by ROW_COUNT and COLUMN_COUNT so tiles will be clean
     //TODO make Table and BoardTable dependant on Tile dimension not vice versa
-    private static int FRAME_WIDTH = 800;
-    private static int FRAME_HEIGHT = 800;
+    private static int FRAME_WIDTH = 750;
+    private static int FRAME_HEIGHT = 950;
 
     private static int BOARD_TO_FRAME_DIFFERENCE = 200;
     private static int BOARD_WIDTH = FRAME_WIDTH - BOARD_TO_FRAME_DIFFERENCE;
@@ -50,6 +53,7 @@ public class Table {
 
     public Table(){
         this.chessBoard = Board.createStandardBoard();
+
         this.gameFrame = new JFrame("Chess");
         this.gameFrame.setLayout(new BorderLayout());
 
@@ -57,10 +61,18 @@ public class Table {
         this.gameFrame.setJMenuBar(menuBar);
 
         this.gameFrame.setSize(FRAME_DIMENSION);
+
         this.boardTablePanel = new BoardTablePanel();
+        this.whitePlayerPanel = chessBoard.getWhitePlayer().getPlayerPanel();
+        this.blackPlayerPanel = chessBoard.getBlackPlayer().getPlayerPanel();
+
+
         this.gameFrame.add(this.boardTablePanel, BorderLayout.CENTER);
+        this.gameFrame.add(this.blackPlayerPanel, BorderLayout.NORTH);
+        this.gameFrame.add(this.whitePlayerPanel, BorderLayout.SOUTH);
 
         this.gameFrame.setVisible(true);
+
     }
 
     private JMenuBar createMenuBar() {
@@ -144,7 +156,7 @@ public class Table {
                 this.boardTiles.add(tilePanel);
                 add(tilePanel);
             }
-            setPreferredSize(BOARD_TABLE_PANEL_DIMENSION);
+            setBounds(BOARD_TO_FRAME_DIFFERENCE/2, 0, BOARD_WIDTH, BOARD_HEIGHT);
             validate();
         }
 
@@ -176,7 +188,6 @@ public class Table {
                 public void mouseClicked(MouseEvent e) {
 
                     if(isRightMouseButton(e)){
-                        System.out.println("Rightclicked");
                         clearSelection();
                     }
 
@@ -184,9 +195,6 @@ public class Table {
                         if(sourceTile == null) {
                             sourceTile = chessBoard.getTile(tileID);
                             movedPiece = sourceTile.getPiece();
-
-                            System.out.println("Leftclicked");
-                            System.out.println("Piece selected:" + movedPiece.toString());
                             if (movedPiece == null) {
                                 sourceTile = null;
                             }
@@ -195,7 +203,6 @@ public class Table {
                             if(sourceTile.getTileCoordinates() == destinationTile.getTileCoordinates()){
                                 clearSelection();
                             } else {
-                                System.out.println("Destination selected" + destinationTile.getTileCoordinates());
                                 final Move move = Move.moveMaker.createMove(chessBoard, sourceTile.getTileCoordinates(), destinationTile.getTileCoordinates());
                                 final BoardTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
                                 if(transition.getMoveStatus().isDone()){
@@ -204,6 +211,7 @@ public class Table {
                                 }
                                 sourceTile = null;
                                 movedPiece = null;
+                                destinationTile = null;
                             }
                         }
                     }
@@ -285,7 +293,6 @@ public class Table {
     }
 
     private void clearSelection(){
-        System.out.println("Piece selection reset");
         sourceTile = null;
         destinationTile = null;
         movedPiece = null;

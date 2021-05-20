@@ -1,34 +1,49 @@
 package pjv.chess.players;
 
 import pjv.chess.board.*;
+import pjv.chess.gui.PlayerPanel;
 import pjv.chess.pieces.ChessPiece;
 import pjv.chess.pieces.King;
 import pjv.chess.pieces.Rook;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Player {
+    private static int DEFAULT_TIME = 300;
+    private static int DEFAULT_INCREMENT = 10;
+
     Board board;
     King playerKing;
     boolean alliance;
     Collection<Move> myMoves;
     Collection<Move> opponentsMoves;
+    int timeLeft;
+    ChessClock chessClock;
+    PlayerPanel playerPanel;
 
 
-    public Player(Board board, boolean alliance, Collection<Move> whiteLegalMoves, Collection<Move> blackLegalMoves) {
+    public Player(Board board, boolean alliance, Collection<Move> whiteLegalMoves, Collection<Move> blackLegalMoves, int timeLeft, PlayerPanel playerPanel) {
 
         this.board = board;
         this.playerKing = setupKing();
         this.alliance = alliance;
         this.myMoves = alliance ? whiteLegalMoves : blackLegalMoves;
         this.opponentsMoves = !alliance ? whiteLegalMoves : blackLegalMoves;
+        this.playerPanel = playerPanel;
+        this.timeLeft = timeLeft;
+        this.chessClock = new ChessClock(timeLeft, this.alliance, this.playerPanel);
+
         if(myMoves.addAll(calculateCastleMoves(myMoves, opponentsMoves, alliance))){
-            System.out.println("Added even more successfully");
+            //System.out.println("Added even more successfully");
         };
-        board.printAllLegalMovesOfPiece(board.getTile(Utils.WHITE_KING_POSITION));
-        board.printAllLegalMovesOfPiece(board.getTile(Utils.BLACK_KING_POSITION));
+        //board.printAllLegalMovesOfPiece(board.getTile(Utils.WHITE_KING_POSITION));
+        //board.printAllLegalMovesOfPiece(board.getTile(Utils.BLACK_KING_POSITION));
     }
 
     private King setupKing() {
@@ -39,6 +54,8 @@ public class Player {
         }
         throw new RuntimeException("Invalid board, player has no King");
     }
+
+    //all getters
 
     public Collection<ChessPiece> getMyPieces() {
         return this.alliance ? this.board.getWhitePieces() : this.board.getBlackPieces();
@@ -58,6 +75,19 @@ public class Player {
 
     public boolean getAlliance(){ return this.alliance; }
 
+    public ChessClock getChessClock(){ return this.chessClock; }
+
+    public int getDefaultTime(){ return DEFAULT_TIME; }
+
+    public int getDefaultIncrement(){ return DEFAULT_INCREMENT; }
+
+    public PlayerPanel getPlayerPanel(){ return this.playerPanel;}
+
+    public void setPlayerPanel(PlayerPanel playerPanel){
+        this.playerPanel = playerPanel;
+    }
+
+
     Collection<Move> calculateCastleMoves(Collection<Move> playerLegalMoves, Collection<Move> opponentLegalMoves, boolean alliance){ //white = true;
         Collection<Move> kingCastleMoves = new ArrayList<>();
         int kingsPosition = alliance ? Utils.WHITE_KING_POSITION : Utils.BLACK_KING_POSITION;
@@ -68,20 +98,20 @@ public class Player {
             if(!closerRookTile.isEmpty() && closerRookTile.getPiece().isFirstMove()){
                 if(isLegalForCastling(this.board.getTile(kingsPosition + Utils.CLOSER_ROOK_DISTANCE-2) , opponentLegalMoves) &&
                         isLegalForCastling(this.board.getTile(kingsPosition + Utils.CLOSER_ROOK_DISTANCE-1) , opponentLegalMoves)){
-                    System.out.println("I got here - short castle");
+                    //System.out.println("I got here - short castle");
                     if(kingCastleMoves.add(new Move.ShortCastleMove(this.board, this.playerKing, kingsPosition +Utils.CLOSER_ROOK_DISTANCE-1,
                             (Rook) closerRookTile.getPiece(), closerRookTile.getTileCoordinates(), closerRookTile.getTileCoordinates()-Utils.CLOSER_ROOK_DISTANCE+1))){
-                        System.out.println("Added successfully");
+                        //System.out.println("Added successfully");
                     };
                 }
 
             } if (!furtherRookTile.isEmpty() && furtherRookTile.getPiece().isFirstMove()){
                 if(isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+2) , opponentLegalMoves) &&
                         isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+1) , opponentLegalMoves)){
-                    System.out.println("I got here - long castle");
+                    //System.out.println("I got here - long castle");
                     if(kingCastleMoves.add(new Move.LongCastleMove(this.board, this.playerKing, kingsPosition -Utils.FURTHER_ROOK_DISTANCE+2,
                         (Rook) closerRookTile.getPiece(), closerRookTile.getTileCoordinates(), closerRookTile.getTileCoordinates()+Utils.FURTHER_ROOK_DISTANCE-1))){
-                        System.out.println("Added successfully");
+                        //System.out.println("Added successfully");
                     };
                 }
             }
@@ -127,6 +157,17 @@ public class Player {
         return false;
     }
 
+    public void startClock(){
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        //executor.schedule(this.chessClock, 0, TimeUnit.SECONDS);
+        executor.scheduleAtFixedRate(this.chessClock, 0, 1, TimeUnit.SECONDS);
+    }
+
+    public void stopClock(){
+        this.chessClock.requestStop();
+        this.playerPanel.update(this.chessClock.getTimeLeft());
+    }
+
     public BoardTransition makeMove(Move move){
 
         if(!isLegalMove(move)){
@@ -135,8 +176,8 @@ public class Player {
 
             Board newBoard = move.moveExecution();
 
-            Collection<Move> kingsAttacks = Player.calculateAttacksOnTile(newBoard.getCurrentPlayer().getOpponent().getPlayerKing().getPiecePosition(),
-                    newBoard.getCurrentPlayer().getMyMoves());
+            Collection<Move> kingsAttacks = Player.calculateAttacksOnTile(newBoard.getCurrentPlayer().getPlayerKing().getPiecePosition(),
+                    newBoard.getCurrentPlayer().getOpponent().getMyMoves());
 
             if(!kingsAttacks.isEmpty()){ //king is in check
                 return new BoardTransition(this.board, move, Move.MoveStatus.DOES_SELF_CHECK);
