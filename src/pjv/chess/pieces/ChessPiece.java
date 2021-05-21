@@ -12,9 +12,10 @@ public abstract class ChessPiece {
     boolean alliance; //true = white, false = black
     boolean isFirstMove = true; //because of castling and pawn jump
 
-    ChessPiece(int piecePosition, boolean alliance){
+    ChessPiece(int piecePosition, boolean alliance, boolean isFirstMove){
         this.piecePosition = piecePosition;
         this.alliance = alliance;
+        this.isFirstMove = isFirstMove;
     }
 
     @Override

@@ -46,6 +46,10 @@ public class Table {
 
     private static String CHESS_PIECES_IMAGES_PATH = "gui/chesspieces/";
     private static String HIGHLIGHT_DOT_PATH = "gui/move_highlighter.png";
+    private static String WHITE_KING = "gui/white_K.png";
+    private static String BLACK_KING = "gui/black_K.png";
+    private static String WHITE_KING_HIGHLIGHTER = "gui/white_K_highlighted.png";
+    private static String BLACK_KING_HIGHLIGHTER = "gui/black_K_highlighted.png";
     private static String PIECE_HIGHLIGHT_PATH = "gui/piece_highlighter.png";
 
     private Color lightTileColor = Color.decode("#FFFACC");
@@ -206,8 +210,22 @@ public class Table {
                                 final Move move = Move.moveMaker.createMove(chessBoard, sourceTile.getTileCoordinates(), destinationTile.getTileCoordinates());
                                 final BoardTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
                                 if(transition.getMoveStatus().isDone()){
+                                    chessBoard.getCurrentPlayer().stopClock();
+                                    if(chessBoard.getCurrentPlayer().getAlliance()){
+                                        chessBoard.getWhitePlayer().getPlayerPanel().update(chessBoard.getWhitePlayer().getChessClock().getTimeLeft() + chessBoard.getWhitePlayer().getDefaultIncrement());
+                                    } else {
+                                        chessBoard.getBlackPlayer().getPlayerPanel().update(chessBoard.getBlackPlayer().getChessClock().getTimeLeft() + chessBoard.getBlackPlayer().getDefaultIncrement());
+                                    }
                                     chessBoard = transition.getNewBoard();
+                                    chessBoard.getCurrentPlayer().startClock();
                                     //TODO add move to move log for PGN save
+                                } else if(transition.getMoveStatus().isCheck()){
+                                    try {
+                                        //TODO
+                                        highlightAttackedKing(chessBoard);
+                                    } catch (IOException ioException) {
+                                        ioException.printStackTrace();
+                                    }
                                 }
                                 sourceTile = null;
                                 movedPiece = null;
@@ -241,6 +259,10 @@ public class Table {
             validate();
         }
 
+        private void highlightAttackedKing(Board board) throws IOException {
+            //TODO
+        }
+
         private void assignChessPieceIcon(Board board){
             this.removeAll();
             if(!board.getTile(this.tileID).isEmpty()){
@@ -256,20 +278,29 @@ public class Table {
         }
 
         private void highlightLegalMoves(Board board){ //used for debugging
-                for(Move move : pieceLegalMoves(board)){
-                    if(move.getDestinationCoordinate() == this.tileID){
-                        try {
-                            add(new JLabel(new ImageIcon(ImageIO.read(new File(HIGHLIGHT_DOT_PATH)))));
-                        } catch (Exception e){
-                            e.printStackTrace();
-                        }
+
+            for(Move move : pieceLegalMoves(board)){
+                if(move.getDestinationCoordinate() == this.tileID){
+                    try {
+                        add(new JLabel(new ImageIcon(ImageIO.read(new File(HIGHLIGHT_DOT_PATH)))));
+                    } catch (Exception e){
+                        e.printStackTrace();
                     }
                 }
             }
+        }
         private Collection<Move> pieceLegalMoves(final Board board) {
             if(movedPiece != null && movedPiece.getPieceAlliance() == board.getCurrentPlayer().getAlliance()) {
-                return movedPiece.calculateAllLegalMoves(board);
+                Collection<Move> legalMoves;
+                legalMoves = movedPiece.calculateAllLegalMoves(board);
+                if(movedPiece.isKing()){
+                    legalMoves.addAll(movedPiece.getPieceAlliance() ?
+                            board.getWhitePlayer().calculateCastleMoves(board.getBlackPlayer().getMyMoves(), true) :
+                            board.getBlackPlayer().calculateCastleMoves(board.getWhitePlayer().getMyMoves(), false));
+                }
+                return legalMoves;
             }
+
             return Collections.emptyList();
         }
 

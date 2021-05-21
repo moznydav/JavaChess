@@ -18,29 +18,31 @@ public abstract class Move {
         this.pieceDestination = pieceDestination;
     }
 
-    public Board moveExecution(){
-        Board.Builder builder = new Board.Builder();
+    public abstract Board moveExecution();
 
-        for(ChessPiece piece : this.board.getCurrentPlayer().getMyPieces()){
-            if(!this.movedPiece.equals(piece)){
-                builder.setPiece(piece);
-            }
-        }
-
-        for(ChessPiece piece : this.board.getCurrentPlayer().getOpponent().getMyPieces()){
-            builder.setPiece(piece);
-        }
-        builder.setPiece(this.movedPiece.movePiece(this));
-        this.movedPiece.switchFirstMove();
-        this.board.getCurrentPlayer().stopClock();
-        endTurn(builder);
-        return builder.build();
-    }
 
     public static class DefaultMove extends Move{
 
         public DefaultMove(Board board, ChessPiece movedPiece, int pieceDestination) {
             super(board, movedPiece, pieceDestination);
+        }
+        @Override
+        public Board moveExecution(){
+            Board.Builder builder = new Board.Builder();
+
+            for(ChessPiece piece : this.board.getCurrentPlayer().getMyPieces()){
+                if(!this.movedPiece.equals(piece)){
+                    builder.setPiece(piece);
+                }
+            }
+
+            for(ChessPiece piece : this.board.getCurrentPlayer().getOpponent().getMyPieces()){
+                builder.setPiece(piece);
+            }
+            this.movedPiece.switchFirstMove();
+            builder.setPiece(this.movedPiece.movePiece(this));
+            endTurn(builder);
+            return builder.build();
         }
 
     }
@@ -81,16 +83,15 @@ public abstract class Move {
                     builder.setPiece(piece);
                 }
             }
-            builder.setPiece(this.movedPiece.movePiece(this));
             this.movedPiece.switchFirstMove();
-            this.board.getCurrentPlayer().stopClock();
+            builder.setPiece(this.movedPiece.movePiece(this));
             endTurn(builder);
             return builder.build();
         }
 
     }
 
-    public static class PawnMove extends Move{
+    public static class PawnMove extends DefaultMove{
 
         PawnMove(Board board, ChessPiece movedPiece, int pieceDestination) {
             super(board, movedPiece, pieceDestination);
@@ -122,7 +123,6 @@ public abstract class Move {
                 builder.setPiece(piece);
             }
             builder.setPiece(this.promotedPawn.getPromotedPiece().movePiece(this));
-            this.board.getCurrentPlayer().stopClock();
             endTurn(builder);
             return builder.build();
         }
@@ -150,7 +150,6 @@ public abstract class Move {
             builder.setPiece(movedPawn);
             builder.setEnPassantPawn(movedPawn);
             this.movedPiece.switchFirstMove();
-            this.board.getCurrentPlayer().stopClock();
             endTurn(builder);
             return builder.build();
         }
@@ -163,7 +162,7 @@ public abstract class Move {
         }
     }
 
-   static abstract class CastleMove extends Move {
+   public static class CastleMove extends Move {
         Rook castleRook;
         int castleRookPosition;
         int casteRookDestination;
@@ -195,10 +194,9 @@ public abstract class Move {
             for(ChessPiece piece : this.board.getCurrentPlayer().getOpponent().getMyPieces()){
                 builder.setPiece(piece);
             }
-            builder.setPiece(this.movedPiece.movePiece(this));
-            builder.setPiece(new Rook(this.castleRook.getPiecePosition(), this.castleRook.getPieceAlliance()));
             this.movedPiece.switchFirstMove();
-            this.board.getCurrentPlayer().stopClock();
+            builder.setPiece(this.movedPiece.movePiece(this));
+            builder.setPiece(new Rook(this.casteRookDestination, this.castleRook.getPieceAlliance()));
             endTurn(builder);
             return builder.build();
         }
@@ -242,11 +240,9 @@ public abstract class Move {
         if(board.getCurrentPlayer().getAlliance()){
             builder.keepWhiteTime(board.getWhitePlayer().getChessClock().getTimeLeft() + board.getWhitePlayer().getDefaultIncrement());
             builder.keepBlackTime(board.getBlackPlayer().getChessClock().getTimeLeft() );
-            board.getWhitePlayer().getPlayerPanel().update(board.getWhitePlayer().getChessClock().getTimeLeft() + board.getWhitePlayer().getDefaultIncrement());
         } else {
             builder.keepWhiteTime(board.getWhitePlayer().getChessClock().getTimeLeft() );
             builder.keepBlackTime(board.getBlackPlayer().getChessClock().getTimeLeft() + board.getBlackPlayer().getDefaultIncrement());
-            board.getBlackPlayer().getPlayerPanel().update(board.getBlackPlayer().getChessClock().getTimeLeft() + board.getBlackPlayer().getDefaultIncrement());
         }
         builder.keepWhitePlayerPanel(board.getWhitePlayer().getPlayerPanel());
         builder.keepBlackPanel(board.getBlackPlayer().getPlayerPanel());
@@ -265,6 +261,11 @@ public abstract class Move {
             public boolean isIllegal() {
                 return false;
             }
+
+            @Override
+            public boolean isCheck() {
+                return false;
+            }
         },
         ILLEGAL_MOVE {
             @Override
@@ -275,6 +276,11 @@ public abstract class Move {
             @Override
             public boolean isIllegal() {
                 return true;
+            }
+
+            @Override
+            public boolean isCheck() {
+                return false;
             }
         },
         DOES_SELF_CHECK {
@@ -287,11 +293,18 @@ public abstract class Move {
             public boolean isIllegal() {
                 return false;
             }
+
+            @Override
+            public boolean isCheck() {
+                return true;
+            }
         };
 
         public abstract boolean isDone();
 
         public abstract boolean isIllegal();
+
+        public abstract boolean isCheck();
     }
 
     public static class moveMaker{

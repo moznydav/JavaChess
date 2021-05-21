@@ -12,7 +12,7 @@ public class Queen extends ChessPiece{
     private final static int[] MOVE_OFFSETS = {-9, -8, -7, -1, 1, 7, 8, 9}; //offsets from current location for "queen move"
 
     public Queen(int piecePosition, boolean alliance) {
-        super(piecePosition, alliance);
+        super(piecePosition, alliance, true);
     }
 
     @Override

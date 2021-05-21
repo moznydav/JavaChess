@@ -18,7 +18,7 @@ public class Pawn extends ChessPiece{
     int BLACK_COEFFICIENT = 1;
 
     public Pawn(int piecePosition, boolean alliance) {
-        super(piecePosition, alliance);
+        super(piecePosition, alliance, true);
     }
 
     @Override

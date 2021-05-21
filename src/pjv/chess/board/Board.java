@@ -33,8 +33,8 @@ public class Board {
         this.blackPieces = countActivePieces(this.chessBoard, false);
         this.enPassantPawn = builder.enPassantPawn;
 
-        List<Move> whiteLegalMoves = calculateLegalMoves(this.whitePieces);
-        List<Move> blackLegalMoves = calculateLegalMoves(this.blackPieces);
+        Collection<Move> whiteLegalMoves = calculateLegalMoves(this.whitePieces);
+        Collection<Move> blackLegalMoves = calculateLegalMoves(this.blackPieces);
 
         this.whitePlayerPanel = whitePlayerPanel;
         this.blackPlayerPanel = blackPlayerPanel;
@@ -49,7 +49,7 @@ public class Board {
         this.whitePlayer = new Player(this, true, whiteLegalMoves, blackLegalMoves, whiteTime, whitePlayerPanel);
         this.blackPlayer = new Player(this, false, whiteLegalMoves, blackLegalMoves, blackTime, blackPlayerPanel);
         this.currentPlayer = builder.thisTurn ? this.whitePlayer : this.blackPlayer;
-        this.currentPlayer.startClock();
+        //this.currentPlayer.startClock();
 
     }
 
@@ -96,8 +96,8 @@ public class Board {
     }
 
 
-    private List<Move> calculateLegalMoves(Collection<ChessPiece> chessPieces) {
-        List<Move> legalMoves = new ArrayList<>();
+    private Collection<Move> calculateLegalMoves(Collection<ChessPiece> chessPieces) {
+        Collection<Move> legalMoves = new ArrayList<>();
 
         for(final ChessPiece chessPiece : chessPieces){
             legalMoves.addAll(chessPiece.calculateAllLegalMoves(this));

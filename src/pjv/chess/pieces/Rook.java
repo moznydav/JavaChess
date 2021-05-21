@@ -14,7 +14,11 @@ public class Rook extends ChessPiece{
     boolean firstMove = true;
 
     public Rook(int piecePosition, boolean alliance) {
-        super(piecePosition, alliance);
+        super(piecePosition, alliance, true);
+    }
+
+    public Rook(int piecePosition, boolean alliance, boolean isFirstMove){
+        super(piecePosition, alliance, isFirstMove);
     }
 
     @Override

@@ -5,11 +5,13 @@ import pjv.chess.board.Move;
 
 public class BoardTransition {
 
+    private Board oldBoard;
     private Board newBoard;
     private Move move;
-    private Move.MoveStatus moveStatus; //is legal
+    private Move.MoveStatus moveStatus;
 
-    public BoardTransition(Board newBoard, Move move, Move.MoveStatus moveStatus){
+    public BoardTransition(Board oldBoard, Board newBoard, Move move, Move.MoveStatus moveStatus){
+        this.oldBoard = oldBoard;
         this.newBoard = newBoard;
         this.move = move;
         this.moveStatus = moveStatus;
@@ -21,5 +23,9 @@ public class BoardTransition {
 
     public Board getNewBoard(){
         return this.newBoard;
+    }
+
+    public Board getOldBoard(){
+        return this.oldBoard;
     }
 }

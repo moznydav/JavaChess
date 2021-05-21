@@ -23,6 +23,8 @@ public class Player {
     boolean alliance;
     Collection<Move> myMoves;
     Collection<Move> opponentsMoves;
+    boolean isInCheck;
+
     int timeLeft;
     ChessClock chessClock;
     PlayerPanel playerPanel;
@@ -31,19 +33,27 @@ public class Player {
     public Player(Board board, boolean alliance, Collection<Move> whiteLegalMoves, Collection<Move> blackLegalMoves, int timeLeft, PlayerPanel playerPanel) {
 
         this.board = board;
-        this.playerKing = setupKing();
         this.alliance = alliance;
         this.myMoves = alliance ? whiteLegalMoves : blackLegalMoves;
         this.opponentsMoves = !alliance ? whiteLegalMoves : blackLegalMoves;
+
+        this.playerKing = setupKing();
+        this.isInCheck = !calculateAttacksOnTile(this.playerKing.getPiecePosition(), opponentsMoves).isEmpty();
+        myMoves.addAll(calculateCastleMoves(opponentsMoves, this.alliance));
+
         this.playerPanel = playerPanel;
         this.timeLeft = timeLeft;
         this.chessClock = new ChessClock(timeLeft, this.alliance, this.playerPanel);
 
-        if(myMoves.addAll(calculateCastleMoves(myMoves, opponentsMoves, alliance))){
-            //System.out.println("Added even more successfully");
-        };
-        //board.printAllLegalMovesOfPiece(board.getTile(Utils.WHITE_KING_POSITION));
-        //board.printAllLegalMovesOfPiece(board.getTile(Utils.BLACK_KING_POSITION));
+
+
+
+        if (this.isInCheck) {
+            System.out.println((this.alliance ? "White" : "Black") + " is in check");
+        } else {
+            System.out.println((this.alliance ? "White" : "Black") + " is not in check");
+        }
+
     }
 
     private King setupKing() {
@@ -54,6 +64,19 @@ public class Player {
         }
         throw new RuntimeException("Invalid board, player has no King");
     }
+
+    public Collection<Move> cutLegalMoves(Collection<Move> legalMoves){
+        BoardTransition newBoard;
+        Collection<Move> cutMoves = new ArrayList<>();
+        for(Move move : legalMoves){
+            newBoard = makeMove(move);
+            if(newBoard.getMoveStatus().isDone()){
+                cutMoves.add(move);
+            }
+        }
+        return cutMoves;
+    }
+
 
     //all getters
 
@@ -88,7 +111,7 @@ public class Player {
     }
 
 
-    Collection<Move> calculateCastleMoves(Collection<Move> playerLegalMoves, Collection<Move> opponentLegalMoves, boolean alliance){ //white = true;
+    public Collection<Move> calculateCastleMoves(Collection<Move> opponentLegalMoves, boolean alliance){ //white = true;
         Collection<Move> kingCastleMoves = new ArrayList<>();
         int kingsPosition = alliance ? Utils.WHITE_KING_POSITION : Utils.BLACK_KING_POSITION;
         Tile closerRookTile = this.board.getTile(kingsPosition + Utils.CLOSER_ROOK_DISTANCE);
@@ -98,18 +121,19 @@ public class Player {
             if(!closerRookTile.isEmpty() && closerRookTile.getPiece().isFirstMove()){
                 if(isLegalForCastling(this.board.getTile(kingsPosition + Utils.CLOSER_ROOK_DISTANCE-2) , opponentLegalMoves) &&
                         isLegalForCastling(this.board.getTile(kingsPosition + Utils.CLOSER_ROOK_DISTANCE-1) , opponentLegalMoves)){
-                    //System.out.println("I got here - short castle");
-                    if(kingCastleMoves.add(new Move.ShortCastleMove(this.board, this.playerKing, kingsPosition +Utils.CLOSER_ROOK_DISTANCE-1,
+                    if(kingCastleMoves.add(new Move.CastleMove(this.board, this.playerKing, kingsPosition +Utils.CLOSER_ROOK_DISTANCE-1,
                             (Rook) closerRookTile.getPiece(), closerRookTile.getTileCoordinates(), closerRookTile.getTileCoordinates()-Utils.CLOSER_ROOK_DISTANCE+1))){
-                        //System.out.println("Added successfully");
+                        System.out.println("Rook is at " + closerRookTile.getTileCoordinates() + " and is going to " + (closerRookTile.getTileCoordinates()-Utils.CLOSER_ROOK_DISTANCE+1));
+                        System.out.println("I added short castle");
                     };
                 }
 
             } if (!furtherRookTile.isEmpty() && furtherRookTile.getPiece().isFirstMove()){
-                if(isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+2) , opponentLegalMoves) &&
+                if(isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+3) , opponentLegalMoves) &&
+                        isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+2) , opponentLegalMoves) &&
                         isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+1) , opponentLegalMoves)){
-                    //System.out.println("I got here - long castle");
-                    if(kingCastleMoves.add(new Move.LongCastleMove(this.board, this.playerKing, kingsPosition -Utils.FURTHER_ROOK_DISTANCE+2,
+                    System.out.println("I got here - long castle");
+                    if(kingCastleMoves.add(new Move.CastleMove(this.board, this.playerKing, kingsPosition -Utils.FURTHER_ROOK_DISTANCE+2,
                         (Rook) closerRookTile.getPiece(), closerRookTile.getTileCoordinates(), closerRookTile.getTileCoordinates()+Utils.FURTHER_ROOK_DISTANCE-1))){
                         //System.out.println("Added successfully");
                     };
@@ -141,25 +165,27 @@ public class Player {
         return false;
     }
 
-    public boolean hasEscapeSquares(){
+    public boolean isInStaleMate(){
+        return !this.isInCheck && !hasEscapeSquares();
+    }
+
+    private boolean hasEscapeSquares(){
         for(Move move: this.playerKing.calculateAllLegalMoves(this.board)){
-            if(!calculateAttacksOnTile(move.getDestinationCoordinate(), this.opponentsMoves).isEmpty()){
+            BoardTransition newBoard = makeMove(move);
+            if(newBoard.getMoveStatus().isDone()){
                 return true;
             }
         }
         return false;
     }
 
-    public boolean isInStaleMate(){
-        return false;
-    }
+
     public boolean hasCastled(){
         return false;
     }
 
     public void startClock(){
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        //executor.schedule(this.chessClock, 0, TimeUnit.SECONDS);
         executor.scheduleAtFixedRate(this.chessClock, 0, 1, TimeUnit.SECONDS);
     }
 
@@ -171,18 +197,17 @@ public class Player {
     public BoardTransition makeMove(Move move){
 
         if(!isLegalMove(move)){
-                return new BoardTransition(this.board, move, Move.MoveStatus.ILLEGAL_MOVE);
+                return new BoardTransition(this.board, this.board, move, Move.MoveStatus.ILLEGAL_MOVE);
             }
-
             Board newBoard = move.moveExecution();
 
-            Collection<Move> kingsAttacks = Player.calculateAttacksOnTile(newBoard.getCurrentPlayer().getPlayerKing().getPiecePosition(),
-                    newBoard.getCurrentPlayer().getOpponent().getMyMoves());
+            Collection<Move> kingsAttacks = calculateAttacksOnTile(newBoard.getCurrentPlayer().getOpponent().getPlayerKing().getPiecePosition(),
+                    newBoard.getCurrentPlayer().getMyMoves());
 
             if(!kingsAttacks.isEmpty()){ //king is in check
-                return new BoardTransition(this.board, move, Move.MoveStatus.DOES_SELF_CHECK);
+                return new BoardTransition(this.board, this.board, move, Move.MoveStatus.DOES_SELF_CHECK);
             }
-            return new BoardTransition(newBoard, move, Move.MoveStatus.DONE);
+            return new BoardTransition(this.board, newBoard, move, Move.MoveStatus.DONE);
     }
 
 

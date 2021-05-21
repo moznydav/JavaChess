@@ -6,13 +6,18 @@ import pjv.chess.board.Tile;
 import pjv.chess.board.Utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class King extends ChessPiece{
     private final static int[] MOVE_OFFSETS = {-9, -8, -7, -1, 1, 7, 8, 9}; //offsets from current location for "king move"
 
     public King(int piecePosition, boolean alliance) {
-        super(piecePosition, alliance);
+        super(piecePosition, alliance, true);
+    }
+
+    public King(int piecePosition, boolean alliance, boolean isFirstMove){
+        super(piecePosition, alliance, isFirstMove);
     }
 
     @Override
@@ -51,7 +56,11 @@ public class King extends ChessPiece{
     @Override
     public ChessPiece movePiece(Move move) {
 
-        return new King(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
+        return new King(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance(), false);
+    }
+
+    public void addCastleMoves(Collection<Move> castleMoves){
+
     }
 
     private boolean isOverEdgeMove(int piecePosition, int offset){

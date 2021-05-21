@@ -14,7 +14,11 @@ public class Bishop extends ChessPiece{
     private final static int[] MOVE_OFFSETS = {-9, -7, 7, 9}; //offsets from current location for "bishop move"
 
     public Bishop(int piecePosition, boolean alliance) {
-        super(piecePosition, alliance);
+        super(piecePosition, alliance, true);
+    }
+
+    public Bishop(int piecePosition, boolean alliance, boolean isFirstMove){
+        super(piecePosition, alliance, isFirstMove);
     }
 
     @Override
