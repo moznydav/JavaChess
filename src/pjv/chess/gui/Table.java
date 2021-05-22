@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,10 +23,10 @@ import static javax.swing.SwingUtilities.isRightMouseButton;
 public class Table {
 
     private JFrame gameFrame;
-    private BoardTablePanel boardTablePanel;
+    public BoardTablePanel boardTablePanel;
     private PlayerPanel blackPlayerPanel;
     private PlayerPanel whitePlayerPanel;
-    private Board chessBoard;
+    public Board chessBoard;
 
     private Tile sourceTile;
     private Tile destinationTile;
@@ -55,8 +56,12 @@ public class Table {
     private Color lightTileColor = Color.decode("#FFFACC");
     private Color darkTileColor = Color.decode("#593E1B");
 
-    public Table(){
+    private static Table INSTANCE = new Table();
+
+    private Table(){
         this.chessBoard = Board.createStandardBoard();
+        //this.chessBoard = Board.createBoardFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0, 1");
+        //System.out.println(FENUtils.saveGameToFEN(this.chessBoard));
 
         this.gameFrame = new JFrame("Chess");
         this.gameFrame.setLayout(new BorderLayout());
@@ -77,6 +82,24 @@ public class Table {
 
         this.gameFrame.setVisible(true);
 
+    }
+
+    public static Table get(){return INSTANCE;}
+
+    private BoardTablePanel getBoardPanel() {
+        return this.boardTablePanel;
+    }
+
+    private Board getGameBoard() {
+        return this.chessBoard;
+    }
+
+    private PlayerPanel getWhitePlayerPanel(){ return whitePlayerPanel;}
+
+    private PlayerPanel getBlackPlayerPanel(){ return blackPlayerPanel;}
+
+    public void show() {
+        Table.get().getBoardPanel().drawBoard(Table.get().getGameBoard());
     }
 
     private JMenuBar createMenuBar() {
@@ -107,6 +130,20 @@ public class Table {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                String fenCode = JOptionPane.showInputDialog("Type or copy a standard FEN code");
+                Table.get().getGameBoard().getWhitePlayer().stopClock();
+                Table.get().getGameBoard().getBlackPlayer().stopClock();
+
+                PlayerPanel whitePlayerPanel = Table.get().getGameBoard().getWhitePlayer().getPlayerPanel();
+                PlayerPanel blackPlayerPanel = Table.get().getGameBoard().getBlackPlayer().getPlayerPanel();
+
+                System.out.println(fenCode);
+                chessBoard = FENUtils.createGameFromFEN(fenCode);
+                chessBoard.getWhitePlayer().setPlayerPanel(whitePlayerPanel);
+                chessBoard.getBlackPlayer().setPlayerPanel(blackPlayerPanel);
+
+                Table.get().getBoardPanel().drawBoard(chessBoard);
+
                 System.out.println("Loading board from FEN");
             }
         });
@@ -119,6 +156,30 @@ public class Table {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                String fenFileName = JOptionPane.showInputDialog("Type the title of your saved board, you can find it in folder \"saves\"");
+                File saveFile = new File(Utils.SAVE_PATH + fenFileName + ".txt");
+                int counter = 0;
+                while(true){
+                    counter++;
+                    try {
+                        if(saveFile.createNewFile()){
+                            break;
+                        } else {
+                            saveFile = new File(Utils.SAVE_PATH + fenFileName + counter + ".txt");
+                        }
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
+                }
+                FileWriter myWriter = null;
+                try {
+                    myWriter = new FileWriter(Utils.SAVE_PATH + saveFile.getName());
+                    String text = FENUtils.saveGameToFEN(Table.get().getGameBoard());
+                    myWriter.write(text);
+                    myWriter.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
                 System.out.println("Saving board to FEN");
             }
         });
@@ -177,7 +238,6 @@ public class Table {
 
     private class TilePanel extends JPanel{
 
-
         private int tileID;
 
         TilePanel(BoardTablePanel boardTablePanel, int tileID){
@@ -212,9 +272,9 @@ public class Table {
                                 if(transition.getMoveStatus().isDone()){
                                     chessBoard.getCurrentPlayer().stopClock();
                                     if(chessBoard.getCurrentPlayer().getAlliance()){
-                                        chessBoard.getWhitePlayer().getPlayerPanel().update(chessBoard.getWhitePlayer().getChessClock().getTimeLeft() + chessBoard.getWhitePlayer().getDefaultIncrement());
+                                        chessBoard.getWhitePlayer().getPlayerPanel().update(chessBoard.getWhitePlayer().getChessClock().getTimeLeft() + Utils.DEFAULT_INCREMENT);
                                     } else {
-                                        chessBoard.getBlackPlayer().getPlayerPanel().update(chessBoard.getBlackPlayer().getChessClock().getTimeLeft() + chessBoard.getBlackPlayer().getDefaultIncrement());
+                                        chessBoard.getBlackPlayer().getPlayerPanel().update(chessBoard.getBlackPlayer().getChessClock().getTimeLeft() + Utils.DEFAULT_INCREMENT);
                                     }
                                     chessBoard = transition.getNewBoard();
                                     chessBoard.getCurrentPlayer().startClock();

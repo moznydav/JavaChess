@@ -238,11 +238,11 @@ public abstract class Move {
     public void endTurn(Board.Builder builder){
 
         if(board.getCurrentPlayer().getAlliance()){
-            builder.keepWhiteTime(board.getWhitePlayer().getChessClock().getTimeLeft() + board.getWhitePlayer().getDefaultIncrement());
+            builder.keepWhiteTime(board.getWhitePlayer().getChessClock().getTimeLeft() + Utils.DEFAULT_INCREMENT);
             builder.keepBlackTime(board.getBlackPlayer().getChessClock().getTimeLeft() );
         } else {
             builder.keepWhiteTime(board.getWhitePlayer().getChessClock().getTimeLeft() );
-            builder.keepBlackTime(board.getBlackPlayer().getChessClock().getTimeLeft() + board.getBlackPlayer().getDefaultIncrement());
+            builder.keepBlackTime(board.getBlackPlayer().getChessClock().getTimeLeft() + Utils.DEFAULT_INCREMENT);
         }
         builder.keepWhitePlayerPanel(board.getWhitePlayer().getPlayerPanel());
         builder.keepBlackPanel(board.getBlackPlayer().getPlayerPanel());

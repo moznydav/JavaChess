@@ -87,9 +87,6 @@ public class Pawn extends ChessPiece{
                         }
                         break;
                 }
-                if(Utils.getRowNumber(this.piecePosition) == 7 && !this.alliance){
-                    System.out.println("Pawn is on tile: " + this.piecePosition);
-                }
             }
         }
         return legalMoves;

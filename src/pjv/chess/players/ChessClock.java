@@ -30,7 +30,10 @@ public class ChessClock implements Runnable{
 
             if(this.alliance){
                 playerPanel.update(this.timeLeft);
+                //System.out.println("White has " + timeLeft + " seconds left");
+
             } else {
+                //System.out.println("Black has " + timeLeft + " seconds left");
                 playerPanel.update(this.timeLeft);
             }
         }
