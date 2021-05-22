@@ -62,7 +62,7 @@ public class Rook extends ChessPiece{
     @Override
     public ChessPiece movePiece(Move move) {
 
-        return new Rook(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
+        return new Rook(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance(), false);
     }
 
     private boolean isOverEdgeMove(int piecePosition, int offset){

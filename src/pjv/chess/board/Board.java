@@ -51,6 +51,7 @@ public class Board {
         this.currentPlayer = builder.thisTurn ? this.whitePlayer : this.blackPlayer;
         //this.currentPlayer.startClock();
 
+
     }
 
     private List<ChessPiece> countActivePieces(List<Tile> chessBoard, boolean alliance){
@@ -165,6 +166,10 @@ public class Board {
         return builder.build();
     }
 
+    public static Board createBoardFromFEN(String FEN){
+        return FENUtils.createGameFromFEN(FEN);
+    }
+
     public Tile getTile(int tileCoord){
 
         return chessBoard.get(tileCoord);
@@ -173,6 +178,8 @@ public class Board {
     public int getWhiteTime(){ return this.whiteTime; }
 
     public int getBlackTime(){ return this.blackTime; }
+
+    public static int getDefaultTime(){ return DEFAULT_TIME; }
 
 
     @Override
@@ -211,10 +218,6 @@ public class Board {
         public Builder setPiece(ChessPiece piece){
             this.boardConfig.put(piece.getPiecePosition(), piece);
             return this;
-        }
-
-        public Player chooseActivePlayer(Player whitePlayer, Player blackPlayer, boolean isWhitesTurn){
-            return isWhitesTurn ? whitePlayer : blackPlayer;
         }
 
         public Builder setNextTurn(boolean nextTurn){ //true - white

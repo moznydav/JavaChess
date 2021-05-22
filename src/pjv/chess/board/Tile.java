@@ -81,8 +81,7 @@ public abstract class Tile {
 
         @Override
         public String toString(){
-            //return this.onTile.toString().toLowerCase();
-            return this.onTile.getPieceAlliance() == true ? this.onTile.toString().toLowerCase() : this.onTile.toString().toUpperCase();
+            return this.onTile.getPieceAlliance() == true ? this.onTile.toString().toUpperCase() : this.onTile.toString().toLowerCase();
         }
 
     }

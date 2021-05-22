@@ -56,7 +56,9 @@ public class Table {
     private Color darkTileColor = Color.decode("#593E1B");
 
     public Table(){
-        this.chessBoard = Board.createStandardBoard();
+        //this.chessBoard = Board.createStandardBoard();
+        this.chessBoard = Board.createBoardFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0, 1");
+        System.out.println(FENUtils.saveGameToFEN(this.chessBoard));
 
         this.gameFrame = new JFrame("Chess");
         this.gameFrame.setLayout(new BorderLayout());

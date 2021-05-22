@@ -124,7 +124,6 @@ public class Player {
                     if(kingCastleMoves.add(new Move.CastleMove(this.board, this.playerKing, kingsPosition +Utils.CLOSER_ROOK_DISTANCE-1,
                             (Rook) closerRookTile.getPiece(), closerRookTile.getTileCoordinates(), closerRookTile.getTileCoordinates()-Utils.CLOSER_ROOK_DISTANCE+1))){
                         System.out.println("Rook is at " + closerRookTile.getTileCoordinates() + " and is going to " + (closerRookTile.getTileCoordinates()-Utils.CLOSER_ROOK_DISTANCE+1));
-                        System.out.println("I added short castle");
                     };
                 }
 
@@ -132,9 +131,8 @@ public class Player {
                 if(isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+3) , opponentLegalMoves) &&
                         isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+2) , opponentLegalMoves) &&
                         isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+1) , opponentLegalMoves)){
-                    System.out.println("I got here - long castle");
                     if(kingCastleMoves.add(new Move.CastleMove(this.board, this.playerKing, kingsPosition -Utils.FURTHER_ROOK_DISTANCE+2,
-                        (Rook) closerRookTile.getPiece(), closerRookTile.getTileCoordinates(), closerRookTile.getTileCoordinates()+Utils.FURTHER_ROOK_DISTANCE-1))){
+                        (Rook) furtherRookTile.getPiece(), furtherRookTile.getTileCoordinates(), furtherRookTile.getTileCoordinates()+Utils.FURTHER_ROOK_DISTANCE-1))){
                         //System.out.println("Added successfully");
                     };
                 }
@@ -221,4 +219,19 @@ public class Player {
         return attackMoves;
     }
 
+    public boolean isKingSideCastleCapable() {
+        int kingSideRookCoordinate = this.alliance ? 63 : 7;
+        if(this.playerKing.isFirstMove() && this.board.getTile(kingSideRookCoordinate).getPiece().isFirstMove()){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isQueenSideCastleCapable() {
+        int QueenSideRookCoordinate = this.alliance ? 56 : 0;
+        if(this.playerKing.isFirstMove() && this.board.getTile(QueenSideRookCoordinate).getPiece().isFirstMove()){
+            return true;
+        }
+        return false;
+    }
 }
