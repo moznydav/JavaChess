@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,7 +61,7 @@ public class Table {
     private Table(){
         this.chessBoard = Board.createStandardBoard();
         //this.chessBoard = Board.createBoardFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0, 1");
-        System.out.println(FENUtils.saveGameToFEN(this.chessBoard));
+        //System.out.println(FENUtils.saveGameToFEN(this.chessBoard));
 
         this.gameFrame = new JFrame("Chess");
         this.gameFrame.setLayout(new BorderLayout());
@@ -130,8 +131,17 @@ public class Table {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String fenCode = JOptionPane.showInputDialog("Type or copy a standard FEN code");
+                Table.get().getGameBoard().getWhitePlayer().stopClock();
+                Table.get().getGameBoard().getBlackPlayer().stopClock();
+
+                PlayerPanel whitePlayerPanel = Table.get().getGameBoard().getWhitePlayer().getPlayerPanel();
+                PlayerPanel blackPlayerPanel = Table.get().getGameBoard().getBlackPlayer().getPlayerPanel();
+
                 System.out.println(fenCode);
                 chessBoard = FENUtils.createGameFromFEN(fenCode);
+                chessBoard.getWhitePlayer().setPlayerPanel(whitePlayerPanel);
+                chessBoard.getBlackPlayer().setPlayerPanel(blackPlayerPanel);
+
                 Table.get().getBoardPanel().drawBoard(chessBoard);
 
                 System.out.println("Loading board from FEN");
@@ -146,6 +156,30 @@ public class Table {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                String fenFileName = JOptionPane.showInputDialog("Type the title of your saved board, you can find it in folder \"saves\"");
+                File saveFile = new File(Utils.SAVE_PATH + fenFileName + ".txt");
+                int counter = 0;
+                while(true){
+                    counter++;
+                    try {
+                        if(saveFile.createNewFile()){
+                            break;
+                        } else {
+                            saveFile = new File(Utils.SAVE_PATH + fenFileName + counter + ".txt");
+                        }
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
+                }
+                FileWriter myWriter = null;
+                try {
+                    myWriter = new FileWriter(Utils.SAVE_PATH + saveFile.getName());
+                    String text = FENUtils.saveGameToFEN(Table.get().getGameBoard());
+                    myWriter.write(text);
+                    myWriter.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
                 System.out.println("Saving board to FEN");
             }
         });
@@ -192,7 +226,6 @@ public class Table {
         }
 
         public void drawBoard(Board chessBoard) {
-            System.out.println("I tried to happen");
             removeAll();
             for(TilePanel tilePanel : boardTiles){
                 tilePanel.drawTile(chessBoard);
@@ -239,9 +272,9 @@ public class Table {
                                 if(transition.getMoveStatus().isDone()){
                                     chessBoard.getCurrentPlayer().stopClock();
                                     if(chessBoard.getCurrentPlayer().getAlliance()){
-                                        chessBoard.getWhitePlayer().getPlayerPanel().update(chessBoard.getWhitePlayer().getChessClock().getTimeLeft() + chessBoard.getWhitePlayer().getDefaultIncrement());
+                                        chessBoard.getWhitePlayer().getPlayerPanel().update(chessBoard.getWhitePlayer().getChessClock().getTimeLeft() + Utils.DEFAULT_INCREMENT);
                                     } else {
-                                        chessBoard.getBlackPlayer().getPlayerPanel().update(chessBoard.getBlackPlayer().getChessClock().getTimeLeft() + chessBoard.getBlackPlayer().getDefaultIncrement());
+                                        chessBoard.getBlackPlayer().getPlayerPanel().update(chessBoard.getBlackPlayer().getChessClock().getTimeLeft() + Utils.DEFAULT_INCREMENT);
                                     }
                                     chessBoard = transition.getNewBoard();
                                     chessBoard.getCurrentPlayer().startClock();

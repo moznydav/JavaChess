@@ -10,6 +10,12 @@ public enum Utils {;
     public static int CLOSER_ROOK_DISTANCE = 3;
     public static int FURTHER_ROOK_DISTANCE = 4;
 
+
+    public static int DEFAULT_TIME = 300;
+    public static int DEFAULT_INCREMENT = 10;
+
+    public static String SAVE_PATH = "saves/";
+
     public static int getColumnNumber(int piecePosition){
         return piecePosition % 8 + 1;
     }
@@ -23,8 +29,8 @@ public enum Utils {;
 
     public static String getAlgebraicNotation(int piecePosition){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(String.valueOf(96 + getColumnNumber(piecePosition)));
-        stringBuilder.append(String.valueOf(57 - getRowNumber(piecePosition)));
+        stringBuilder.append(Character.toString((char) 96 + getColumnNumber(piecePosition)));
+        stringBuilder.append(Character.toString((char) 57 - getRowNumber(piecePosition)));
 
         return stringBuilder.toString();
     }

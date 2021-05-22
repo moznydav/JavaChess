@@ -15,9 +15,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Player {
-    private static int DEFAULT_TIME = 300;
-    private static int DEFAULT_INCREMENT = 10;
-
     Board board;
     King playerKing;
     boolean alliance;
@@ -90,10 +87,6 @@ public class Player {
     public boolean getAlliance(){ return this.alliance; }
 
     public ChessClock getChessClock(){ return this.chessClock; }
-
-    public int getDefaultTime(){ return DEFAULT_TIME; }
-
-    public int getDefaultIncrement(){ return DEFAULT_INCREMENT; }
 
     public PlayerPanel getPlayerPanel(){ return this.playerPanel;}
 

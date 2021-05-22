@@ -9,7 +9,6 @@ import javax.management.ImmutableDescriptor;
 import java.util.*;
 
 public class Board {
-    private static int DEFAULT_TIME = 300;
 
     private List<Tile> chessBoard;
     Collection<ChessPiece> whitePieces;
@@ -158,8 +157,8 @@ public class Board {
 
         //white has the first move
         builder.setNextTurn(true);
-        builder.keepWhiteTime(DEFAULT_TIME);
-        builder.keepBlackTime(DEFAULT_TIME);
+        builder.keepWhiteTime(Utils.DEFAULT_TIME - Utils.DEFAULT_INCREMENT);
+        builder.keepBlackTime(Utils.DEFAULT_TIME);
         builder.keepWhitePlayerPanel(new PlayerPanel(true));
         builder.keepBlackPanel(new PlayerPanel(false));
 
@@ -170,6 +169,13 @@ public class Board {
         return FENUtils.createGameFromFEN(FEN);
     }
 
+    public void setBlackPanel(PlayerPanel blackPlayerPanel){
+        this.blackPlayerPanel = blackPlayerPanel;
+    }
+    public void setWhitePanel(PlayerPanel whitePlayerPanel){
+        this.whitePlayerPanel = whitePlayerPanel;
+    }
+
     public Tile getTile(int tileCoord){
 
         return chessBoard.get(tileCoord);
@@ -178,8 +184,6 @@ public class Board {
     public int getWhiteTime(){ return this.whiteTime; }
 
     public int getBlackTime(){ return this.blackTime; }
-
-    public static int getDefaultTime(){ return DEFAULT_TIME; }
 
 
     @Override

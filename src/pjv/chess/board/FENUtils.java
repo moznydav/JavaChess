@@ -17,8 +17,8 @@ public class FENUtils {
         String[] tokenizedBoard = tokenizedFEN[0].split("/");
 
         builder.setNextTurn(tokenizedFEN[1] == "w" ? false : true);
-        builder.keepWhiteTime(Board.getDefaultTime());
-        builder.keepBlackTime(Board.getDefaultTime());
+        builder.keepWhiteTime(Utils.DEFAULT_TIME - Utils.DEFAULT_INCREMENT);
+        builder.keepBlackTime(Utils.DEFAULT_TIME);
         builder.keepWhitePlayerPanel(new PlayerPanel(true));
         builder.keepBlackPanel(new PlayerPanel(false));
 
