@@ -45,15 +45,6 @@ public class Player {
         this.timeLeft = timeLeft;
         this.chessClock = new ChessClock(timeLeft, this.alliance, this.playerPanel);
 
-
-
-
-        if (this.isInCheck) {
-            System.out.println((this.alliance ? "White" : "Black") + " is in check");
-        } else {
-            System.out.println((this.alliance ? "White" : "Black") + " is not in check");
-        }
-
     }
 
     private King setupKing() {
@@ -123,7 +114,6 @@ public class Player {
                         isLegalForCastling(this.board.getTile(kingsPosition + Utils.CLOSER_ROOK_DISTANCE-1) , opponentLegalMoves)){
                     if(kingCastleMoves.add(new Move.CastleMove(this.board, this.playerKing, kingsPosition +Utils.CLOSER_ROOK_DISTANCE-1,
                             (Rook) closerRookTile.getPiece(), closerRookTile.getTileCoordinates(), closerRookTile.getTileCoordinates()-Utils.CLOSER_ROOK_DISTANCE+1))){
-                        System.out.println("Rook is at " + closerRookTile.getTileCoordinates() + " and is going to " + (closerRookTile.getTileCoordinates()-Utils.CLOSER_ROOK_DISTANCE+1));
                     };
                 }
 

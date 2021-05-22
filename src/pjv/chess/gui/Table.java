@@ -22,10 +22,10 @@ import static javax.swing.SwingUtilities.isRightMouseButton;
 public class Table {
 
     private JFrame gameFrame;
-    private BoardTablePanel boardTablePanel;
+    public BoardTablePanel boardTablePanel;
     private PlayerPanel blackPlayerPanel;
     private PlayerPanel whitePlayerPanel;
-    private Board chessBoard;
+    public Board chessBoard;
 
     private Tile sourceTile;
     private Tile destinationTile;
@@ -55,9 +55,11 @@ public class Table {
     private Color lightTileColor = Color.decode("#FFFACC");
     private Color darkTileColor = Color.decode("#593E1B");
 
-    public Table(){
-        //this.chessBoard = Board.createStandardBoard();
-        this.chessBoard = Board.createBoardFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0, 1");
+    private static Table INSTANCE = new Table();
+
+    private Table(){
+        this.chessBoard = Board.createStandardBoard();
+        //this.chessBoard = Board.createBoardFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0, 1");
         System.out.println(FENUtils.saveGameToFEN(this.chessBoard));
 
         this.gameFrame = new JFrame("Chess");
@@ -79,6 +81,24 @@ public class Table {
 
         this.gameFrame.setVisible(true);
 
+    }
+
+    public static Table get(){return INSTANCE;}
+
+    private BoardTablePanel getBoardPanel() {
+        return this.boardTablePanel;
+    }
+
+    private Board getGameBoard() {
+        return this.chessBoard;
+    }
+
+    private PlayerPanel getWhitePlayerPanel(){ return whitePlayerPanel;}
+
+    private PlayerPanel getBlackPlayerPanel(){ return blackPlayerPanel;}
+
+    public void show() {
+        Table.get().getBoardPanel().drawBoard(Table.get().getGameBoard());
     }
 
     private JMenuBar createMenuBar() {
@@ -109,6 +129,11 @@ public class Table {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                String fenCode = JOptionPane.showInputDialog("Type or copy a standard FEN code");
+                System.out.println(fenCode);
+                chessBoard = FENUtils.createGameFromFEN(fenCode);
+                Table.get().getBoardPanel().drawBoard(chessBoard);
+
                 System.out.println("Loading board from FEN");
             }
         });
@@ -167,6 +192,7 @@ public class Table {
         }
 
         public void drawBoard(Board chessBoard) {
+            System.out.println("I tried to happen");
             removeAll();
             for(TilePanel tilePanel : boardTiles){
                 tilePanel.drawTile(chessBoard);
@@ -178,7 +204,6 @@ public class Table {
     }
 
     private class TilePanel extends JPanel{
-
 
         private int tileID;
 

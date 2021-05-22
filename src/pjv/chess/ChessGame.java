@@ -6,6 +6,6 @@ import pjv.chess.gui.Table;
 public class ChessGame {
 
     public static void main(String[] args){
-        Table table = new Table();
+        Table.get().show();
     }
 }
