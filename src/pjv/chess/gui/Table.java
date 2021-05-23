@@ -130,6 +130,34 @@ public class Table {
         }
     }
 
+    public void staleMatePopUpWindow(){
+        int input = JOptionPane.showConfirmDialog(null, "Draw by stalemate\n" +
+                "Do you want to create a new game?", "Stalemate", JOptionPane.YES_NO_OPTION);
+        if(input == JOptionPane.YES_OPTION){
+            Table.get().setUpNextGame();
+        }
+    }
+
+    public void endGameCheck(Player currentPlayer){
+        if(currentPlayer.isInCheckMate()){
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    boardTablePanel.drawBoard(chessBoard);
+                }
+            });
+            checkmatePopUpWindow(currentPlayer.getAlliance());
+        } else if(currentPlayer.isInStaleMate()){
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    boardTablePanel.drawBoard(chessBoard);
+                }
+            });
+            staleMatePopUpWindow();
+        }
+    }
+
     public void setUpNextGame(){
         Table.get().getGameBoard().getWhitePlayer().stopClock();
         Table.get().getGameBoard().getBlackPlayer().stopClock();
@@ -361,15 +389,8 @@ public class Table {
                                     }
                                     chessBoard = transition.getNewBoard();
 
-                                    if(chessBoard.getCurrentPlayer().isInCheckMate()){
-                                        SwingUtilities.invokeLater(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                boardTablePanel.drawBoard(chessBoard);
-                                            }
-                                        });
-                                        checkmatePopUpWindow(chessBoard.getCurrentPlayer().getAlliance());
-                                    }
+                                    endGameCheck(chessBoard.getCurrentPlayer());
+
                                     chessBoard.getCurrentPlayer().startClock();
 
                                     if((chessBoard.getCurrentPlayer().getAlliance() && Table.get().getWhitePlayerAI()) ||
@@ -382,15 +403,7 @@ public class Table {
                                         chessBoard.getCurrentPlayer().stopClock();
                                         chessBoard = transition.getNewBoard();
 
-                                        if(chessBoard.getCurrentPlayer().isInCheckMate()){
-                                            SwingUtilities.invokeLater(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    boardTablePanel.drawBoard(chessBoard);
-                                                }
-                                            });
-                                            checkmatePopUpWindow(chessBoard.getCurrentPlayer().getAlliance());
-                                        }
+                                        endGameCheck(chessBoard.getCurrentPlayer());
 
                                         chessBoard.getCurrentPlayer().startClock();
                                     }
