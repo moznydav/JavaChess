@@ -24,10 +24,16 @@ public class Board {
     public PlayerPanel whitePlayerPanel;
     public PlayerPanel blackPlayerPanel;
 
+    public boolean whitePlayerAI;
+    public boolean blackPlayerAI;
+
     private Pawn enPassantPawn;
 
     private Board(Builder builder) {
+
         this.chessBoard = createChessBoard(builder);
+        this.whitePlayerAI = false;
+        this.blackPlayerAI = false;
         this.whitePieces = countActivePieces(this.chessBoard,true);
         this.blackPieces = countActivePieces(this.chessBoard, false);
         this.enPassantPawn = builder.enPassantPawn;
@@ -35,8 +41,6 @@ public class Board {
         Collection<Move> whiteLegalMoves = calculateLegalMoves(this.whitePieces);
         Collection<Move> blackLegalMoves = calculateLegalMoves(this.blackPieces);
 
-        this.whitePlayerPanel = whitePlayerPanel;
-        this.blackPlayerPanel = blackPlayerPanel;
 
         //boolean isWhitesTurn = true;
         this.whiteTime = builder.whiteTime;
@@ -176,6 +180,14 @@ public class Board {
         this.whitePlayerPanel = whitePlayerPanel;
     }
 
+    public void setWhitePlayerAI(boolean state){
+        this.whitePlayerAI = state;
+    }
+
+    public void setBlackPlayerAI(boolean state){
+        this.blackPlayerAI = state;
+    }
+
     public Tile getTile(int tileCoord){
 
         return chessBoard.get(tileCoord);
@@ -248,6 +260,7 @@ public class Board {
             this.blackTime = time;
             return this;
         }
+
 
         public Board build(){
             return new Board(this);

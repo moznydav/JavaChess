@@ -1,5 +1,8 @@
 package pjv.chess.board;
 
+import java.util.Collection;
+import java.util.Random;
+
 public enum Utils {;
 
     public static int TILE_COUNT = 64;
@@ -40,5 +43,13 @@ public enum Utils {;
         int rowNumber = 57 - algebraicNotation.charAt(1);
 
         return (columnNumber - 1) * 8 + rowNumber - 1;
+    }
+
+    public static Move getRandomMove(Board board){
+        Collection<Move> moves = board.getCurrentPlayer().getMyMoves();
+        Random random = new Random();
+        int i = random.nextInt(moves.size());
+        return (Move) moves.toArray()[i];
+
     }
 }

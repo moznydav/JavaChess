@@ -56,6 +56,10 @@ public class Table {
     private Color lightTileColor = Color.decode("#FFFACC");
     private Color darkTileColor = Color.decode("#593E1B");
 
+    private boolean whitePlayerAI;
+    private boolean blackPlayerAI;
+    private boolean highlightLegalMoves;
+
     private static Table INSTANCE = new Table();
 
     private Table(){
@@ -68,6 +72,10 @@ public class Table {
 
         JMenuBar menuBar = createMenuBar();
         this.gameFrame.setJMenuBar(menuBar);
+
+        this.whitePlayerAI = false;
+        this.blackPlayerAI = false;
+        this.highlightLegalMoves = true;
 
         this.gameFrame.setSize(FRAME_DIMENSION);
 
@@ -98,16 +106,90 @@ public class Table {
 
     private PlayerPanel getBlackPlayerPanel(){ return blackPlayerPanel;}
 
+    private void setWhitePlayerAI(boolean value){ this.whitePlayerAI = value; }
+
+    private boolean getWhitePlayerAI(){ return this.whitePlayerAI; }
+
+    private void setBlackPlayerAI(boolean value){ this.blackPlayerAI = value; }
+
+    private boolean getBlackPlayerAI(){ return this.blackPlayerAI; }
+
+    private void setHighlightLegalMoves(boolean value){ this.highlightLegalMoves = value; }
+
+    private boolean getHighlightLegalMoves(){ return this.highlightLegalMoves; }
+
     public void show() {
         Table.get().getBoardPanel().drawBoard(Table.get().getGameBoard());
+    }
+
+    public void checkmatePopUpWindow(boolean alliance){
+        int input = JOptionPane.showConfirmDialog(null, (alliance ? "Black " : "White ") + "player won by checkmate\n" +
+                "Do you want to create a new game?", "Checkmate", JOptionPane.YES_NO_OPTION);
+        if(input == JOptionPane.YES_OPTION){
+            Table.get().setUpNextGame();
+        }
+    }
+
+    public void setUpNextGame(){
+        Table.get().getGameBoard().getWhitePlayer().stopClock();
+        Table.get().getGameBoard().getBlackPlayer().stopClock();
+
+        PlayerPanel whitePlayerPanel = Table.get().getGameBoard().getWhitePlayer().getPlayerPanel();
+        PlayerPanel blackPlayerPanel = Table.get().getGameBoard().getBlackPlayer().getPlayerPanel();
+
+        chessBoard = Board.createStandardBoard();
+        chessBoard.getWhitePlayer().setPlayerPanel(whitePlayerPanel);
+        chessBoard.getBlackPlayer().setPlayerPanel(blackPlayerPanel);
+
+        Table.get().getBoardPanel().drawBoard(chessBoard);
     }
 
     private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
         menuBar.add(createFileMenu());
+        menuBar.add(createPreferencesMenu());
 
         return menuBar;
+    }
+
+    private JMenu createPreferencesMenu(){
+        JMenu preferencesMenu = new JMenu("Preferences");
+
+        //White Player AI
+        JCheckBoxMenuItem whitePlayerAI = new JCheckBoxMenuItem("White player AI", false);
+        whitePlayerAI.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                Table.get().setWhitePlayerAI(!Table.get().getWhitePlayerAI());
+                System.out.println("White player AI changed");
+            }
+        });
+        preferencesMenu.add(whitePlayerAI);
+
+        //Black Player AI
+        JCheckBoxMenuItem blackPlayerAI = new JCheckBoxMenuItem("Black player AI", false);
+        blackPlayerAI.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                Table.get().setBlackPlayerAI(!Table.get().getBlackPlayerAI());
+                System.out.println("Black player AI changed");
+            }
+        });
+        preferencesMenu.add(blackPlayerAI);
+
+        //Highlight Legal Moves
+       JCheckBoxMenuItem highlightMoves = new JCheckBoxMenuItem("Highlight legal moves", true);
+        highlightMoves.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                Table.get().setHighlightLegalMoves(!Table.get().getHighlightLegalMoves());
+                System.out.println("Highlight legal moves changed");
+            }
+        });
+       preferencesMenu.add(highlightMoves);
+
+        return preferencesMenu;
     }
 
     private JMenu createFileMenu() {
@@ -120,6 +202,7 @@ public class Table {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Starting new game");
+                Table.get().setUpNextGame();
             }
         });
         fileMenu.add(newGame);
@@ -267,8 +350,8 @@ public class Table {
                             if(sourceTile.getTileCoordinates() == destinationTile.getTileCoordinates()){
                                 clearSelection();
                             } else {
-                                final Move move = Move.moveMaker.createMove(chessBoard, sourceTile.getTileCoordinates(), destinationTile.getTileCoordinates());
-                                final BoardTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
+                                Move move = Move.moveMaker.createMove(chessBoard, sourceTile.getTileCoordinates(), destinationTile.getTileCoordinates());
+                                BoardTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
                                 if(transition.getMoveStatus().isDone()){
                                     chessBoard.getCurrentPlayer().stopClock();
                                     if(chessBoard.getCurrentPlayer().getAlliance()){
@@ -277,7 +360,40 @@ public class Table {
                                         chessBoard.getBlackPlayer().getPlayerPanel().update(chessBoard.getBlackPlayer().getChessClock().getTimeLeft() + Utils.DEFAULT_INCREMENT);
                                     }
                                     chessBoard = transition.getNewBoard();
+
+                                    if(chessBoard.getCurrentPlayer().isInCheckMate()){
+                                        SwingUtilities.invokeLater(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                boardTablePanel.drawBoard(chessBoard);
+                                            }
+                                        });
+                                        checkmatePopUpWindow(chessBoard.getCurrentPlayer().getAlliance());
+                                    }
                                     chessBoard.getCurrentPlayer().startClock();
+
+                                    if((chessBoard.getCurrentPlayer().getAlliance() && Table.get().getWhitePlayerAI()) ||
+                                            (!chessBoard.getCurrentPlayer().getAlliance() && Table.get().getBlackPlayerAI())){
+                                        do{
+                                            System.out.println("Am I stuck?");
+                                            transition = chessBoard.getCurrentPlayer().makeMove(Utils.getRandomMove(chessBoard));
+                                        } while(!transition.getMoveStatus().isDone());
+
+                                        chessBoard.getCurrentPlayer().stopClock();
+                                        chessBoard = transition.getNewBoard();
+
+                                        if(chessBoard.getCurrentPlayer().isInCheckMate()){
+                                            SwingUtilities.invokeLater(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    boardTablePanel.drawBoard(chessBoard);
+                                                }
+                                            });
+                                            checkmatePopUpWindow(chessBoard.getCurrentPlayer().getAlliance());
+                                        }
+
+                                        chessBoard.getCurrentPlayer().startClock();
+                                    }
                                     //TODO add move to move log for PGN save
                                 } else if(transition.getMoveStatus().isCheck()){
                                     try {
@@ -340,7 +456,7 @@ public class Table {
         private void highlightLegalMoves(Board board){ //used for debugging
 
             for(Move move : pieceLegalMoves(board)){
-                if(move.getDestinationCoordinate() == this.tileID){
+                if(move.getDestinationCoordinate() == this.tileID && highlightLegalMoves){
                     try {
                         add(new JLabel(new ImageIcon(ImageIO.read(new File(HIGHLIGHT_DOT_PATH)))));
                     } catch (Exception e){
@@ -377,6 +493,7 @@ public class Table {
             assignTileColor();
             assignChessPieceIcon(chessBoard);
             highlightLegalMoves(board);
+
 
             validate();
             repaint();
