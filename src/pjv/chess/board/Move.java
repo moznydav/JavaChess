@@ -203,18 +203,82 @@ public abstract class Move {
     }
 
     public static class ShortCastleMove extends CastleMove {
+        Rook castleRook;
+        int castleRookPosition;
+        int casteRookDestination;
 
         public ShortCastleMove(Board board, ChessPiece movedPiece, int pieceDestination,
                                Rook castleRook, int castleRookPosition, int casteRookDestination) {
             super(board, movedPiece, pieceDestination, castleRook, castleRookPosition, casteRookDestination);
+            this.castleRook = castleRook;
+            this.castleRookPosition = castleRookPosition;
+            this.casteRookDestination = casteRookDestination;
+        }
+
+        public Rook getCastleRook(){
+            return this.castleRook;
+        }
+        @Override
+        public boolean isCastlingMove(){
+            return true;
+        }
+
+        @Override
+        public Board moveExecution(){
+            Board.Builder builder = new Board.Builder();
+            for(ChessPiece piece : this.board.getCurrentPlayer().getMyPieces()){
+                if(!this.movedPiece.equals(piece) && !this.castleRook.equals(piece)){
+                    builder.setPiece(piece);
+                }
+            }
+            for(ChessPiece piece : this.board.getCurrentPlayer().getOpponent().getMyPieces()){
+                builder.setPiece(piece);
+            }
+            this.movedPiece.switchFirstMove();
+            builder.setPiece(this.movedPiece.movePiece(this));
+            builder.setPiece(new Rook(this.casteRookDestination, this.castleRook.getPieceAlliance()));
+            endTurn(builder);
+            return builder.build();
         }
     }
 
     public static class LongCastleMove extends CastleMove {
+        Rook castleRook;
+        int castleRookPosition;
+        int casteRookDestination;
 
         public LongCastleMove(Board board, ChessPiece movedPiece, int pieceDestination,
                               Rook castleRook, int castleRookPosition, int casteRookDestination) {
             super(board, movedPiece, pieceDestination,  castleRook, castleRookPosition, casteRookDestination);
+            this.castleRook = castleRook;
+            this.castleRookPosition = castleRookPosition;
+            this.casteRookDestination = casteRookDestination;
+        }
+
+        public Rook getCastleRook(){
+            return this.castleRook;
+        }
+        @Override
+        public boolean isCastlingMove(){
+            return true;
+        }
+
+        @Override
+        public Board moveExecution(){
+            Board.Builder builder = new Board.Builder();
+            for(ChessPiece piece : this.board.getCurrentPlayer().getMyPieces()){
+                if(!this.movedPiece.equals(piece) && !this.castleRook.equals(piece)){
+                    builder.setPiece(piece);
+                }
+            }
+            for(ChessPiece piece : this.board.getCurrentPlayer().getOpponent().getMyPieces()){
+                builder.setPiece(piece);
+            }
+            this.movedPiece.switchFirstMove();
+            builder.setPiece(this.movedPiece.movePiece(this));
+            builder.setPiece(new Rook(this.casteRookDestination, this.castleRook.getPieceAlliance()));
+            endTurn(builder);
+            return builder.build();
         }
     }
 

@@ -5,6 +5,7 @@ import pjv.chess.board.Move;
 import pjv.chess.board.Tile;
 import pjv.chess.board.Utils;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,6 +114,22 @@ public class Pawn extends ChessPiece{
     }
 
     public ChessPiece getPromotedPiece(){
+        //TODO optional autopromote
+        String[] options = {"Queen", "Knight", "Rook", "Bishop"};
+
+        int input = JOptionPane.showOptionDialog(null, "Select piece to promote into", "Select piece",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+
+        switch(input){
+            case 0:
+                return new Queen(this.piecePosition, this.getPieceAlliance());
+            case 1:
+                return new Knight(this.piecePosition, this.getPieceAlliance());
+            case 2:
+                return new Rook(this.piecePosition, this.getPieceAlliance());
+            case 3:
+                return new Bishop(this.piecePosition, this.getPieceAlliance());
+        }
         return new Queen(this.piecePosition, this.getPieceAlliance());
     }
 

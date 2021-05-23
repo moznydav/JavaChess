@@ -140,18 +140,18 @@ public class Player {
         return !calculateAttacksOnTile(this.playerKing.getPiecePosition(), opponentsMoves).isEmpty();
     }
     public boolean isInCheckMate(){
-        if(isInCheck() && !hasEscapeSquares()){
+        if(isInCheck() && !hasMoves()){
             return true;
         }
         return false;
     }
 
     public boolean isInStaleMate(){
-        return !this.isInCheck && !hasEscapeSquares();
+        return !this.isInCheck && !hasMoves();
     }
 
-    private boolean hasEscapeSquares(){
-        for(Move move: this.playerKing.calculateAllLegalMoves(this.board)){
+    private boolean hasMoves(){
+        for(Move move: this.getMyMoves()){
             BoardTransition newBoard = makeMove(move);
             if(newBoard.getMoveStatus().isDone()){
                 return true;
