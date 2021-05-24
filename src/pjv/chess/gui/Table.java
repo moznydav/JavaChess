@@ -583,12 +583,7 @@ public class Table {
                                         }
 
                                     } else if(transition.getMoveStatus().isCheck()){
-                                        try {
-                                            //TODO
-                                            highlightAttackedKing(chessBoard);
-                                        } catch (IOException ioException) {
-                                            ioException.printStackTrace();
-                                        }
+                                        //TODO highlight attacked king highlightAttackedKing();
                                     }
                                     sourceTile = null;
                                     movedPiece = null;
@@ -665,8 +660,30 @@ public class Table {
             validate();
         }
 
-        private void highlightAttackedKing(Board board) throws IOException {
-            //TODO
+        private void highlightAttackedKing() throws IOException, InterruptedException {
+            int kingPosition = chessBoard.getCurrentPlayer().getPlayerKing().getPiecePosition();
+
+            BufferedImage redKing = ImageIO.read(new File(CHESS_PIECES_IMAGES_PATH +
+                    (chessBoard.getCurrentPlayer().getAlliance() ? "white_K_highlighted.png" : "black_K_highlighted.png")));
+
+            BufferedImage normalKing = ImageIO.read(new File(CHESS_PIECES_IMAGES_PATH +
+                    (chessBoard.getCurrentPlayer().getAlliance() ? "white_K.gif" : "black_K.gif")));
+
+            for(int i = 0; i < 2; i++){
+                if(!chessBoard.getTile(kingPosition).isEmpty()){
+                    this.removeAll();
+                    add(new JLabel(new ImageIcon(redKing)));
+                    revalidate();
+                    repaint();
+                    Thread.sleep(300);
+                    this.removeAll();
+                    add(new JLabel(new ImageIcon(normalKing)));
+                    revalidate();
+                    repaint();
+                    Thread.sleep(300);
+                }
+            }
+
         }
 
         private void assignChessPieceIcon(Board board){
