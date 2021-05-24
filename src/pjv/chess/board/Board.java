@@ -169,6 +169,22 @@ public class Board {
         return builder.build();
     }
 
+    public static Board createCustomBoard() {
+        Builder builder = new Builder();
+
+        builder.setPiece(new King(60,true));
+        builder.setPiece(new King(4, false));
+
+        builder.setNextTurn(true);
+        builder.keepWhiteTime(Utils.DEFAULT_TIME - Utils.DEFAULT_INCREMENT);
+        builder.keepBlackTime(Utils.DEFAULT_TIME);
+        builder.keepWhitePlayerPanel(new PlayerPanel(true));
+        builder.keepBlackPanel(new PlayerPanel(false));
+
+        return builder.build();
+    }
+
+
     public static Board createBoardFromFEN(String FEN){
         return FENUtils.createGameFromFEN(FEN);
     }
@@ -258,6 +274,16 @@ public class Board {
 
         public Builder keepBlackTime(int time){
             this.blackTime = time;
+            return this;
+        }
+
+        public Builder keepBoard(Board board){
+            for(ChessPiece piece : board.whitePieces){
+                this.boardConfig.put(piece.getPiecePosition(), piece);
+            }
+            for(ChessPiece piece : board.blackPieces){
+                this.boardConfig.put(piece.getPiecePosition(), piece);
+            }
             return this;
         }
 

@@ -1,7 +1,7 @@
 package pjv.chess.gui;
 
 import pjv.chess.board.*;
-import pjv.chess.pieces.ChessPiece;
+import pjv.chess.pieces.*;
 import pjv.chess.players.Player;
 
 import javax.imageio.ImageIO;
@@ -62,6 +62,7 @@ public class Table {
     private boolean whitePlayerAI;
     private boolean blackPlayerAI;
     private boolean highlightLegalMoves;
+    private boolean customizeChessBoard;
 
     private int result; //white gain = 0 - white lost, 1 - draw, 2  - win, 3 - not finished;
 
@@ -85,6 +86,7 @@ public class Table {
         this.whitePlayerAI = false;
         this.blackPlayerAI = false;
         this.highlightLegalMoves = true;
+        this.customizeChessBoard = false;
 
         this.gameFrame.setSize(FRAME_DIMENSION);
 
@@ -126,6 +128,10 @@ public class Table {
     private void setHighlightLegalMoves(boolean value){ this.highlightLegalMoves = value; }
 
     private boolean getHighlightLegalMoves(){ return this.highlightLegalMoves; }
+
+    private boolean getCustomizeChessBoard(){ return this.customizeChessBoard; }
+
+    private void setCustomizeChessBoard(boolean value){ this.customizeChessBoard = value; }
 
     private int getResult(){ return this.result;}
 
@@ -249,6 +255,49 @@ public class Table {
             }
         });
         fileMenu.add(newGame);
+
+        //Customize chessBoard
+        JMenuItem customizeChessBoard = new JMenuItem("Game with custom layout");
+
+        JButton startButton = new JButton("Start Game");
+
+
+        customizeChessBoard.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Table.get().setCustomizeChessBoard(true);
+                chessBoard = Board.createCustomBoard();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        boardTablePanel.drawBoard(chessBoard);
+                    }
+                });
+                chessBoard.getWhitePlayer().setPlayerPanel(whitePlayerPanel);
+                chessBoard.getBlackPlayer().setPlayerPanel(blackPlayerPanel);
+
+                PlayerPanel whitePlayerPanel = Table.get().getGameBoard().getWhitePlayer().getPlayerPanel();
+                startButton.setBounds(270,5,180,50);
+
+
+                startButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        startButton.setVisible(false);
+                        Table.get().setCustomizeChessBoard(false);
+                        chessBoard.getWhitePlayer().setPlayerPanel(whitePlayerPanel);
+                        chessBoard.getBlackPlayer().setPlayerPanel(blackPlayerPanel);
+
+
+                    }
+                });
+                whitePlayerPanel.add(startButton);
+
+                System.out.println("Customize chess board changed");
+            }
+
+        });
+        fileMenu.add(customizeChessBoard);
 
         //Load FEN
         JMenuItem loadFEN = new JMenuItem("Load game from FEN");
@@ -486,73 +535,116 @@ public class Table {
                 @Override
                 public void mouseClicked(MouseEvent e) {
 
-                    if(isRightMouseButton(e)){
-                        clearSelection();
-                    }
+                    if(!customizeChessBoard){
+                        if(isRightMouseButton(e)){
+                            clearSelection();
+                        }
 
-                    else if(isLeftMouseButton(e)){
-                        if(sourceTile == null) {
-                            sourceTile = chessBoard.getTile(tileID);
-                            movedPiece = sourceTile.getPiece();
-                            if (movedPiece == null) {
-                                sourceTile = null;
-                            }
-                        } else {
-                            destinationTile = chessBoard.getTile(tileID);
-                            if(sourceTile.getTileCoordinates() == destinationTile.getTileCoordinates()){
-                                clearSelection();
+                        else if(isLeftMouseButton(e)){
+                            if(sourceTile == null) {
+                                sourceTile = chessBoard.getTile(tileID);
+                                movedPiece = sourceTile.getPiece();
+                                if (movedPiece == null) {
+                                    sourceTile = null;
+                                }
                             } else {
-                                Move move = Move.moveMaker.createMove(chessBoard, sourceTile.getTileCoordinates(), destinationTile.getTileCoordinates());
-                                BoardTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
-                                if(transition.getMoveStatus().isDone()){
-                                    chessBoard.getCurrentPlayer().stopClock();
-                                    if(chessBoard.getCurrentPlayer().getAlliance()){
-                                        chessBoard.getWhitePlayer().getPlayerPanel().update(chessBoard.getWhitePlayer().getChessClock().getTimeLeft() + Utils.DEFAULT_INCREMENT);
-                                    } else {
-                                        chessBoard.getBlackPlayer().getPlayerPanel().update(chessBoard.getBlackPlayer().getChessClock().getTimeLeft() + Utils.DEFAULT_INCREMENT);
-                                    }
-                                    chessBoard = transition.getNewBoard();
-                                    System.out.println(PGNUtils.checkedPGNMove(move.toString(), chessBoard, move));
-                                    moveLog.add(PGNUtils.checkedPGNMove(move.toString(), chessBoard, move));
-                                    endGameCheck(chessBoard.getCurrentPlayer());
-                                    chessBoard.getCurrentPlayer().startClock();
-
-                                    if((chessBoard.getCurrentPlayer().getAlliance() && Table.get().getWhitePlayerAI()) ||
-                                            (!chessBoard.getCurrentPlayer().getAlliance() && Table.get().getBlackPlayerAI())){
-                                        do{
-                                            System.out.println("Am I stuck?");
-                                            move = Utils.getRandomMove(chessBoard);
-                                            transition = chessBoard.getCurrentPlayer().makeMove(move);
-                                        } while(!transition.getMoveStatus().isDone());
-
+                                destinationTile = chessBoard.getTile(tileID);
+                                if(sourceTile.getTileCoordinates() == destinationTile.getTileCoordinates()){
+                                    clearSelection();
+                                } else {
+                                    Move move = Move.moveMaker.createMove(chessBoard, sourceTile.getTileCoordinates(), destinationTile.getTileCoordinates());
+                                    BoardTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
+                                    if(transition.getMoveStatus().isDone()){
                                         chessBoard.getCurrentPlayer().stopClock();
+                                        if(chessBoard.getCurrentPlayer().getAlliance()){
+                                            chessBoard.getWhitePlayer().getPlayerPanel().update(chessBoard.getWhitePlayer().getChessClock().getTimeLeft() + Utils.DEFAULT_INCREMENT);
+                                        } else {
+                                            chessBoard.getBlackPlayer().getPlayerPanel().update(chessBoard.getBlackPlayer().getChessClock().getTimeLeft() + Utils.DEFAULT_INCREMENT);
+                                        }
                                         chessBoard = transition.getNewBoard();
-                                        System.out.println(move.toString());
-                                        moveLog.add(move.toString());
+                                        System.out.println(PGNUtils.checkedPGNMove(move.toString(), chessBoard, move));
+                                        moveLog.add(PGNUtils.checkedPGNMove(move.toString(), chessBoard, move));
                                         endGameCheck(chessBoard.getCurrentPlayer());
                                         chessBoard.getCurrentPlayer().startClock();
-                                    }
 
-                                } else if(transition.getMoveStatus().isCheck()){
-                                    try {
-                                        //TODO
-                                        highlightAttackedKing(chessBoard);
-                                    } catch (IOException ioException) {
-                                        ioException.printStackTrace();
+                                        if((chessBoard.getCurrentPlayer().getAlliance() && Table.get().getWhitePlayerAI()) ||
+                                                (!chessBoard.getCurrentPlayer().getAlliance() && Table.get().getBlackPlayerAI())){
+                                            do{
+                                                move = Utils.getRandomMove(chessBoard);
+                                                transition = chessBoard.getCurrentPlayer().makeMove(move);
+                                            } while(!transition.getMoveStatus().isDone());
+
+                                            chessBoard.getCurrentPlayer().stopClock();
+                                            chessBoard = transition.getNewBoard();
+                                            System.out.println(move.toString());
+                                            moveLog.add(move.toString());
+                                            endGameCheck(chessBoard.getCurrentPlayer());
+                                            chessBoard.getCurrentPlayer().startClock();
+                                        }
+
+                                    } else if(transition.getMoveStatus().isCheck()){
+                                        try {
+                                            //TODO
+                                            highlightAttackedKing(chessBoard);
+                                        } catch (IOException ioException) {
+                                            ioException.printStackTrace();
+                                        }
                                     }
+                                    sourceTile = null;
+                                    movedPiece = null;
+                                    destinationTile = null;
                                 }
-                                sourceTile = null;
-                                movedPiece = null;
-                                destinationTile = null;
                             }
                         }
-                    }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            boardTablePanel.drawBoard(chessBoard);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                boardTablePanel.drawBoard(chessBoard);
+                            }
+                        });
+                    } else {
+                        if(isLeftMouseButton(e)){
+                            Board.Builder builder = new Board.Builder();
+
+                            builder.keepBoard(chessBoard);
+
+                            String[] options = {"Queen", "Knight", "Rook", "Bishop", "Pawn", "Cancel"};
+
+                            int input = JOptionPane.showOptionDialog(null, "Select piece to place on board", "Select piece",
+                                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+
+                            switch(input){
+                                case 0:
+                                    builder.setPiece(new Queen(tileID, tileID>31));
+                                    break;
+                                case 1:
+                                    builder.setPiece(new Knight(tileID, tileID>31));
+                                    break;
+                                case 2:
+                                    builder.setPiece(new Rook(tileID, tileID>31));
+                                    break;
+                                case 3:
+                                    builder.setPiece(new Bishop(tileID, tileID>31));
+                                    break;
+                                case 4:
+                                    builder.setPiece(new Pawn(tileID, tileID>31));
+                                    break;
+                                case 5:
+                                    System.out.println("Canceled");
+                                    break;
+                            }
+                            builder.setNextTurn(true);
+                            builder.keepWhiteTime(Utils.DEFAULT_TIME - Utils.DEFAULT_INCREMENT);
+                            builder.keepBlackTime(Utils.DEFAULT_TIME);
+                            chessBoard = builder.build();
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    boardTablePanel.drawBoard(chessBoard);
+                                }
+                            });
                         }
-                    });
+                    }
                 }
 
                 @Override
@@ -603,6 +695,7 @@ public class Table {
                 }
             }
         }
+
         private Collection<Move> pieceLegalMoves(final Board board) {
             if(movedPiece != null && movedPiece.getPieceAlliance() == board.getCurrentPlayer().getAlliance()) {
                 Collection<Move> legalMoves;
@@ -617,7 +710,6 @@ public class Table {
 
             return Collections.emptyList();
         }
-
 
         private void assignTileColor() {
 
