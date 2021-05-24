@@ -9,9 +9,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +27,9 @@ public class Table {
     private PlayerPanel blackPlayerPanel;
     private PlayerPanel whitePlayerPanel;
     public Board chessBoard;
+
+    public List<Board> exploredGame;
+    public int exploredGamePosition;
 
     private Tile sourceTile;
     private Tile destinationTile;
@@ -60,10 +63,16 @@ public class Table {
     private boolean blackPlayerAI;
     private boolean highlightLegalMoves;
 
+    private int result; //white gain = 0 - white lost, 1 - draw, 2  - win, 3 - not finished;
+
+    private List<String> moveLog;
+
     private static Table INSTANCE = new Table();
 
     private Table(){
         this.chessBoard = Board.createStandardBoard();
+        this.moveLog = new ArrayList<>();
+        this.result = 3;
         //this.chessBoard = Board.createBoardFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0, 1");
         //System.out.println(FENUtils.saveGameToFEN(this.chessBoard));
 
@@ -118,6 +127,8 @@ public class Table {
 
     private boolean getHighlightLegalMoves(){ return this.highlightLegalMoves; }
 
+    private int getResult(){ return this.result;}
+
     public void show() {
         Table.get().getBoardPanel().drawBoard(Table.get().getGameBoard());
     }
@@ -140,6 +151,7 @@ public class Table {
 
     public void endGameCheck(Player currentPlayer){
         if(currentPlayer.isInCheckMate()){
+            this.result = currentPlayer.getAlliance() ? 0 : 2;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -148,6 +160,7 @@ public class Table {
             });
             checkmatePopUpWindow(currentPlayer.getAlliance());
         } else if(currentPlayer.isInStaleMate()){
+            this.result = 1;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -164,6 +177,8 @@ public class Table {
 
         PlayerPanel whitePlayerPanel = Table.get().getGameBoard().getWhitePlayer().getPlayerPanel();
         PlayerPanel blackPlayerPanel = Table.get().getGameBoard().getBlackPlayer().getPlayerPanel();
+
+        moveLog.clear();
 
         chessBoard = Board.createStandardBoard();
         chessBoard.getWhitePlayer().setPlayerPanel(whitePlayerPanel);
@@ -268,7 +283,7 @@ public class Table {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String fenFileName = JOptionPane.showInputDialog("Type the title of your saved board, you can find it in folder \"saves\"");
-                File saveFile = new File(Utils.SAVE_PATH + fenFileName + ".txt");
+                File saveFile = new File(FENUtils.SAVE_PATH + fenFileName + ".txt");
                 int counter = 0;
                 while(true){
                     counter++;
@@ -276,7 +291,7 @@ public class Table {
                         if(saveFile.createNewFile()){
                             break;
                         } else {
-                            saveFile = new File(Utils.SAVE_PATH + fenFileName + counter + ".txt");
+                            saveFile = new File(FENUtils.SAVE_PATH + fenFileName + counter + ".txt");
                         }
                     } catch (IOException ioException) {
                         ioException.printStackTrace();
@@ -284,7 +299,7 @@ public class Table {
                 }
                 FileWriter myWriter = null;
                 try {
-                    myWriter = new FileWriter(Utils.SAVE_PATH + saveFile.getName());
+                    myWriter = new FileWriter(FENUtils.SAVE_PATH + saveFile.getName());
                     String text = FENUtils.saveGameToFEN(Table.get().getGameBoard());
                     myWriter.write(text);
                     myWriter.close();
@@ -302,6 +317,30 @@ public class Table {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                String pgnCodePath = JOptionPane.showInputDialog("Type name of your save (format \"your input\".txt)");
+
+                Table.get().getGameBoard().getWhitePlayer().stopClock();
+                Table.get().getGameBoard().getBlackPlayer().stopClock();
+
+                PlayerPanel whitePlayerPanel = Table.get().getGameBoard().getWhitePlayer().getPlayerPanel();
+                PlayerPanel blackPlayerPanel = Table.get().getGameBoard().getBlackPlayer().getPlayerPanel();
+
+                String pgnCode = null;
+
+                try {
+                    pgnCode = Files.readString(Path.of(PGNUtils.SAVE_PATH + pgnCodePath + ".txt"));
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+
+                chessBoard = PGNUtils.createGameFromPGN(pgnCode);
+
+                chessBoard.getWhitePlayer().setPlayerPanel(whitePlayerPanel);
+                chessBoard.getBlackPlayer().setPlayerPanel(blackPlayerPanel);
+
+                Table.get().getBoardPanel().drawBoard(chessBoard);
+
                 System.out.println("Loading game from PGN");
             }
         });
@@ -313,10 +352,95 @@ public class Table {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Saving game to PGN");
+                String pgnFileName = JOptionPane.showInputDialog("Type the title of your saved board, you can find it in folder \"saves\"");
+                File saveFile = new File(PGNUtils.SAVE_PATH + pgnFileName + ".txt");
+                int counter = 0;
+                while(true){
+                    counter++;
+                    try {
+                        if(saveFile.createNewFile()){
+                            break;
+                        } else {
+                            saveFile = new File(PGNUtils.SAVE_PATH + pgnFileName + counter + ".txt");
+                        }
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
+                }
+                FileWriter myWriter = null;
+                try {
+                    myWriter = new FileWriter(PGNUtils.SAVE_PATH + saveFile.getName());
+                    String text = PGNUtils.saveGameToPGN(moveLog, Table.get().getResult());
+                    myWriter.write(text);
+                    myWriter.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+                System.out.println("Saving board to PGN");
             }
         });
         fileMenu.add(savePGN);
+
+        //Explore with PGN
+        JMenuItem exploreGame = new JMenuItem("Explore game with PGN");
+        exploreGame.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String pgnCodePath = JOptionPane.showInputDialog("Type name of your save (format \"your input\".txt)");
+
+                Table.get().getGameBoard().getWhitePlayer().stopClock();
+                Table.get().getGameBoard().getBlackPlayer().stopClock();
+
+                PlayerPanel whitePlayerPanel = Table.get().getGameBoard().getWhitePlayer().getPlayerPanel();
+                PlayerPanel blackPlayerPanel = Table.get().getGameBoard().getBlackPlayer().getPlayerPanel();
+
+                String pgnCode = null;
+
+                try {
+                    pgnCode = Files.readString(Path.of(PGNUtils.SAVE_PATH + pgnCodePath + ".txt"));
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+                exploredGamePosition = 0;
+                exploredGame = PGNUtils.createExploreGameFromPGN(pgnCode);
+                chessBoard = exploredGame.get(exploredGamePosition);
+                Table.get().getBoardPanel().drawBoard(chessBoard);
+
+                //previous button
+                JButton previousButton = new JButton("Previous");
+                previousButton.setBounds(235,5,90,50);
+                previousButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if(exploredGamePosition > 0){
+                            exploredGamePosition--;
+                            chessBoard = exploredGame.get(exploredGamePosition);
+                            Table.get().getBoardPanel().drawBoard(chessBoard);
+                        }
+                    }
+                });
+                whitePlayerPanel.add(previousButton);
+
+                //previous button
+                JButton nextButton = new JButton("Next");
+                nextButton.setBounds(405,5,90,50);
+                nextButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if(exploredGamePosition < (exploredGame.size() - 1)){
+                            exploredGamePosition++;
+                            chessBoard = exploredGame.get(exploredGamePosition);
+                            Table.get().getBoardPanel().drawBoard(chessBoard);
+                        }
+                    }
+                });
+                whitePlayerPanel.add(nextButton);
+                whitePlayerPanel.invalidate();
+                whitePlayerPanel.repaint();
+            }
+        });
+        fileMenu.add(exploreGame);
 
         return fileMenu;
     }
@@ -388,26 +512,27 @@ public class Table {
                                         chessBoard.getBlackPlayer().getPlayerPanel().update(chessBoard.getBlackPlayer().getChessClock().getTimeLeft() + Utils.DEFAULT_INCREMENT);
                                     }
                                     chessBoard = transition.getNewBoard();
-
+                                    System.out.println(PGNUtils.checkedPGNMove(move.toString(), chessBoard, move));
+                                    moveLog.add(PGNUtils.checkedPGNMove(move.toString(), chessBoard, move));
                                     endGameCheck(chessBoard.getCurrentPlayer());
-
                                     chessBoard.getCurrentPlayer().startClock();
 
                                     if((chessBoard.getCurrentPlayer().getAlliance() && Table.get().getWhitePlayerAI()) ||
                                             (!chessBoard.getCurrentPlayer().getAlliance() && Table.get().getBlackPlayerAI())){
                                         do{
                                             System.out.println("Am I stuck?");
-                                            transition = chessBoard.getCurrentPlayer().makeMove(Utils.getRandomMove(chessBoard));
+                                            move = Utils.getRandomMove(chessBoard);
+                                            transition = chessBoard.getCurrentPlayer().makeMove(move);
                                         } while(!transition.getMoveStatus().isDone());
 
                                         chessBoard.getCurrentPlayer().stopClock();
                                         chessBoard = transition.getNewBoard();
-
+                                        System.out.println(move.toString());
+                                        moveLog.add(move.toString());
                                         endGameCheck(chessBoard.getCurrentPlayer());
-
                                         chessBoard.getCurrentPlayer().startClock();
                                     }
-                                    //TODO add move to move log for PGN save
+
                                 } else if(transition.getMoveStatus().isCheck()){
                                     try {
                                         //TODO

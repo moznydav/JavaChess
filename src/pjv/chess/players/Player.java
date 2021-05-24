@@ -105,7 +105,7 @@ public class Player {
             if(!closerRookTile.isEmpty() && closerRookTile.getPiece().isFirstMove()){
                 if(isLegalForCastling(this.board.getTile(kingsPosition + Utils.CLOSER_ROOK_DISTANCE-2) , opponentLegalMoves) &&
                         isLegalForCastling(this.board.getTile(kingsPosition + Utils.CLOSER_ROOK_DISTANCE-1) , opponentLegalMoves)){
-                    if(kingCastleMoves.add(new Move.CastleMove(this.board, this.playerKing, kingsPosition +Utils.CLOSER_ROOK_DISTANCE-1,
+                    if(kingCastleMoves.add(new Move.ShortCastleMove(this.board, this.playerKing, kingsPosition +Utils.CLOSER_ROOK_DISTANCE-1,
                             (Rook) closerRookTile.getPiece(), closerRookTile.getTileCoordinates(), closerRookTile.getTileCoordinates()-Utils.CLOSER_ROOK_DISTANCE+1))){
                     };
                 }
@@ -114,7 +114,7 @@ public class Player {
                 if(isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+3) , opponentLegalMoves) &&
                         isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+2) , opponentLegalMoves) &&
                         isLegalForCastling(this.board.getTile(kingsPosition - Utils.FURTHER_ROOK_DISTANCE+1) , opponentLegalMoves)){
-                    if(kingCastleMoves.add(new Move.CastleMove(this.board, this.playerKing, kingsPosition -Utils.FURTHER_ROOK_DISTANCE+2,
+                    if(kingCastleMoves.add(new Move.LongCastleMove(this.board, this.playerKing, kingsPosition -Utils.FURTHER_ROOK_DISTANCE+2,
                         (Rook) furtherRookTile.getPiece(), furtherRookTile.getTileCoordinates(), furtherRookTile.getTileCoordinates()+Utils.FURTHER_ROOK_DISTANCE-1))){
                         //System.out.println("Added successfully");
                     };

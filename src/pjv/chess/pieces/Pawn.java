@@ -36,9 +36,10 @@ public class Pawn extends ChessPiece{
                 switch (currentOffset) {
                     case 8:
                         if (destinationTile.isEmpty()) {
-                            legalMoves.add(new Move.DefaultMove(board, this, destinationCoordinate));
                             if(isPromotionSquare(destinationCoordinate, this)){
-                                legalMoves.add(new Move.PawnPromotion(new Move.DefaultMove(board, this, destinationCoordinate)));
+                                legalMoves.add(new Move.PawnPromotion(new Move.PawnMove(board, this, destinationCoordinate)));
+                            } else {
+                                legalMoves.add(new Move.PawnMove(board, this, destinationCoordinate));
                             }
                         }
                         break;
@@ -56,9 +57,9 @@ public class Pawn extends ChessPiece{
                             if((this.alliance && Utils.getColumnNumber(this.piecePosition) != 8) || /*is white*/
                                     (!this.alliance && Utils.getColumnNumber(this.piecePosition) != 1) /*is black*/){
                                 if(isPromotionSquare(destinationCoordinate, this)){
-                                    legalMoves.add(new Move.PawnPromotion(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination)));
+                                    legalMoves.add(new Move.PawnPromotion(new Move.PawnAttackMove(board, this, destinationCoordinate, pieceAtDestination)));
                                 } else {
-                                    legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
+                                    legalMoves.add(new Move.PawnAttackMove(board, this, destinationCoordinate, pieceAtDestination));
                                 }
                             }
                         } else if(board.getEnPassantPawn() != null){
@@ -75,9 +76,9 @@ public class Pawn extends ChessPiece{
                             if((this.alliance && Utils.getColumnNumber(this.piecePosition) != 1) || /*is white*/
                                     (!this.alliance && Utils.getColumnNumber(this.piecePosition) != 8) /*is black*/){
                                 if(isPromotionSquare(destinationCoordinate, this)){
-                                    legalMoves.add(new Move.PawnPromotion(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination)));
+                                    legalMoves.add(new Move.PawnPromotion(new Move.PawnAttackMove(board, this, destinationCoordinate, pieceAtDestination)));
                                 } else {
-                                    legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
+                                    legalMoves.add(new Move.PawnAttackMove(board, this, destinationCoordinate, pieceAtDestination));
                                 }
                             }
                         } else if(board.getEnPassantPawn() != null){

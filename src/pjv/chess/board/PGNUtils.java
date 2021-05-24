@@ -1,33 +1,318 @@
 package pjv.chess.board;
 
+import java.awt.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class PGNUtils {
+
+    public static String SAVE_PATH = "saves/pgn/";
+
+    private static String DEFAULT_EVENT = "[Event \"A match\"]\n";
+    private static String DEFAULT_SITE = "[Site \"Prague, Czech Republic CZ\"]\n";
+    private static String DEFAULT_ROUND = "[Round \"9\"]\n";
+    private static String DEFAULT_WHITE = "[White \"Some dude\"]\n";
+    private static String DEFAULT_BLACK = "[Black \"Some other dude\"]\n";
 
     private PGNUtils(){ throw new RuntimeException("Not instiable"); }
 
 
 
     public static Board createGameFromPGN(String pgnString){
-
-
-        return null;
+        List<Board> allBoards = createExploreGameFromPGN(pgnString);
+        return allBoards.get(allBoards.size() - 1);
     }
 
-    public static String saveGameToPGN(Board board, String moveLog){
+    public static String saveGameToPGN(List<String> moveLog, int whiteGain){ //white gain = 0 - white lost, 1 - draw, 2  - win
+        StringBuilder stringBuilder = new StringBuilder();
+        String result;
+        int moveCounter = 0;
+
+        stringBuilder.append(DEFAULT_EVENT);
+        stringBuilder.append(DEFAULT_SITE);
+        stringBuilder.append("[Date \"" + LocalDate.now() + "\"]\n");
+        stringBuilder.append(DEFAULT_ROUND);
+        stringBuilder.append(DEFAULT_WHITE);
+        stringBuilder.append(DEFAULT_BLACK);
+        stringBuilder.append("[Result \"");
+
+        switch (whiteGain){
+            case 0:
+                result = "0-1";
+                break;
+            case 1:
+                result = "1/2-1/2";
+                break;
+            case 2:
+                result = "1-0";
+                break;
+            default:
+                result = "*";
+        }
+        stringBuilder.append(result + "\"]\n\n");
 
 
-        return null;
+        for(String move : moveLog) {
+            if(moveCounter % 2 == 0){
+                stringBuilder.append((moveCounter / 2 + 1) + ". ");
+            }
+            stringBuilder.append(move + " ");
+            moveCounter++;
+        }
+        if(result != "*"){
+            stringBuilder.append(result);
+        }
+
+        return stringBuilder.toString();
     }
 
 
     public static List<Board> createExploreGameFromPGN(String pgnString){
+        List<Board> allBoards = new ArrayList<>();
+        allBoards.add(Board.createStandardBoard());
+        String[] pgnMoves = tokenizePGN(pgnString)[tokenizePGN(pgnString).length-1].split("\\s");
+        int itemCount = 0;
+        int halfMoveCount = 0;
+        boolean isCurrentPlayerWhite = true;
 
 
+        for(String moveString : pgnMoves){
+            itemCount++;
+            if(itemCount % 3 != 1){
 
+                BoardTransition transition = allBoards.get(halfMoveCount).getCurrentPlayer().makeMove(getMoveFromPGN(moveString,
+                        isCurrentPlayerWhite, allBoards.get(halfMoveCount)));
 
+                allBoards.add(transition.getNewBoard());
 
+                halfMoveCount++;
+                isCurrentPlayerWhite = !isCurrentPlayerWhite;
+            }
+        }
+
+        return allBoards;
+    }
+
+    private static Move getMoveFromPGN(String pgnString, boolean isCurrentPlayerWhite, Board currentBoard){
+        int moveLength = pgnString.length();
+        if(pgnString.charAt(moveLength-1) == '+'){ //'+' doesn't help me
+            moveLength--;
+        }
+        //Collection<Move> myMoves = null;
+        Collection<Move> myMoves = isCurrentPlayerWhite ? currentBoard.getWhitePlayer().getMyMoves() : currentBoard.getBlackPlayer().getMyMoves();
+
+        switch(moveLength){
+
+            case 2: //is PawnMove
+                for(Move move : myMoves){
+                    if(hasSameDestination(pgnString, move, 0) && move.isPawnMove()){
+                        return move;
+                    }
+                }
+                break;
+            case 3: //is DefaultMove/ShortCastle
+                switch (pgnString.charAt(0)){
+                    case 'N':
+                        for(Move move : myMoves) {
+                            if (hasSameDestination(pgnString, move, 1) &&
+                                    move.getMovedPiece().toString() == "N") {
+                                return move;
+                            }
+                        }
+                        break;
+                    case 'B':
+                        for(Move move : myMoves) {
+                            if (hasSameDestination(pgnString, move, 1) &&
+                                    move.getMovedPiece().toString() == "B") {
+                                return move;
+                            }
+                        }
+                        break;
+                    case 'R':
+                        for(Move move : myMoves) {
+                            if (hasSameDestination(pgnString, move, 1) &&
+                                    move.getMovedPiece().toString() == "R") {
+                                return move;
+                            }
+                        }
+                        break;
+                    case 'Q':
+                        for(Move move : myMoves) {
+                            if (hasSameDestination(pgnString, move, 1) &&
+                                    move.getMovedPiece().toString() == "Q") {
+                                return move;
+                            }
+                        }
+                        break;
+                    case 'K':
+                        for(Move move : myMoves) {
+                            if (hasSameDestination(pgnString, move, 1) &&
+                                    move.getMovedPiece().toString() == "K") {
+                                return move;
+                            }
+                        }
+                        break;
+                    case 'O':
+                        for(Move move : myMoves) {
+                            if (move.isShortCastle()) {
+                                return move;
+                            }
+                        }
+                        break;
+
+                }
+                break;
+            case 4: //AttackMove/Disambiguating DefaultMove/PawnAttackMove/Pawn Promotion
+                if(Character.isUpperCase(pgnString.charAt(0))){ //AttackMove/Disambiguating DefaultMove
+                    switch (pgnString.charAt(0)){
+                        case 'N':
+                            for(Move move : myMoves){
+                                if (hasSameDestination(pgnString, move, 2) &&
+                                        move.getMovedPiece().toString() == "N") {
+
+                                    if (attackOrDisambiguatous(pgnString, move)) {
+                                        return move;
+                                    }
+                                }
+                            }
+
+                            break;
+                        case 'B':
+                            for(Move move : myMoves) {
+                                if (hasSameDestination(pgnString, move, 2) &&
+                                        move.getMovedPiece().toString() == "B") {
+                                    if(attackOrDisambiguatous(pgnString, move)) {
+                                        return move;
+                                    }
+                                }
+                            }
+                            break;
+                        case 'R':
+                            for(Move move : myMoves) {
+                                if (hasSameDestination(pgnString, move, 2) &&
+                                        move.getMovedPiece().toString() == "R") {
+                                    if(attackOrDisambiguatous(pgnString, move)) {
+                                        return move;
+                                    }
+                                }
+                            }
+                            break;
+                        case 'Q':
+                            for(Move move : myMoves) {
+                                if (hasSameDestination(pgnString, move, 2) &&
+                                        move.getMovedPiece().toString() == "Q") {
+                                    if(attackOrDisambiguatous(pgnString, move)) {
+                                        return move;
+                                    }
+                                }
+                            }
+                            break;
+                        case 'K':
+                            for(Move move : myMoves) {
+                                if (hasSameDestination(pgnString, move, 2) &&
+                                        move.getMovedPiece().toString() == "K") {
+                                    return move;
+                                }
+                            }
+                            break;
+                        case 'O':
+                            for(Move move : myMoves) {
+                                if (move.isShortCastle()) {
+                                    return move;
+                                }
+                            }
+                            break;
+
+                        default:
+                            throw new IllegalStateException("Unexpected value: " + pgnString.charAt(0));
+                    }
+                }
+                else{//PawnAttackMove/PawnPromotion
+                        for(Move move : myMoves){
+                            if(isInCorrectColumn(pgnString, move, 0) && hasSameDestination(pgnString, move, 2) && pgnString.charAt(1) == 'x'){
+                                return move;
+                            } else if(hasSameDestination(pgnString, move, 0)){
+                                return move;
+                            }
+                        }
+                }
+                break;
+            case 5: //is LongCastle/more Disambiguating moves
+                for(Move move : myMoves){
+                    if(pgnString.charAt(0) == 'O' && move.isLongCastle()){
+                        return move;
+                    }
+                    if((hasSameDestination(pgnString, move, 3)) &&
+                            ((singleDisambiguatousAttack(pgnString, move)) || (doubleDisambiguatous(pgnString, move, 1)))) {
+                        return move;
+                    }
+                }
+
+                break;
+            case 6: //Disambiguating AttackMove
+                for(Move move : myMoves){
+                    if(doubleDisambiguatous(pgnString, move, 2)) {
+                        return move;
+                    }
+                }
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + moveLength);
+        }
         return null;
+    }
+
+    private static boolean hasSameDestination(String pgnString, Move move, int start){
+        String pgnCoordinates = pgnString.substring(start, start+2);
+
+
+        if(move.getDestinationCoordinate() == Utils.getCoordinatesFromAlgebraicNotation(pgnCoordinates)){
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isInCorrectRow(String pgnString, Move move, int start){
+        if((move.getMovedPiece().getPiecePosition() / 8) == pgnString.charAt(start) - 49){
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isInCorrectColumn(String pgnString, Move move, int start){
+        if((move.getMovedPiece().getPiecePosition() % 8) == pgnString.charAt(start) - 97){
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean doubleDisambiguatous(String pgnString, Move move, int start){
+        if(isInCorrectColumn(pgnString, move, start) && isInCorrectRow(pgnString, move, start+1)){
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean singleDisambiguatousAttack(String pgnString, Move move){
+        if((pgnString.charAt(1) == 'x') &&
+                ((Character.isDigit(pgnString.charAt(1))
+                        && ((move.getMovedPiece().getPiecePosition() / 8) == pgnString.charAt(1) - 49)) ||
+                ((move.getMovedPiece().getPiecePosition() % 8) == 104 - pgnString.charAt(1)))){
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean attackOrDisambiguatous(String pgnString, Move move) {
+        if ((pgnString.charAt(1) == 'x') ||
+                (Character.isDigit(pgnString.charAt(1))
+                        && ((move.getMovedPiece().getPiecePosition() / 8) == 56 - pgnString.charAt(1) )) ||
+                ((move.getMovedPiece().getPiecePosition() % 8) == pgnString.charAt(1) - 97) ) {
+            return true;
+        }
+        return false;
     }
 
     private static String[] tokenizePGN(String pgnString){
@@ -35,28 +320,34 @@ public class PGNUtils {
         return tokenizedPGN;
     }
 
+    private static boolean getCurrentPlayer(String pgnString){
+        String[] pgnMoves = tokenizePGN(pgnString)[tokenizePGN(pgnString).length-1].split("\\s");
 
-    public static String[] addToMoveLog(String[] moveLog, Move move, int halfmoveNumber){
-        return null;
+        if(pgnMoves[pgnMoves.length-1] == "0-1" ||
+                pgnMoves[pgnMoves.length-1] == "1-0" ||
+                pgnMoves[pgnMoves.length-1] == "1/2-1/2"){
+            return !(pgnMoves.length % 3 == 0);
+        }
+        return pgnMoves.length % 3 == 0;
     }
+
+    public static String checkedPGNMove(String pgnMove, Board currentBoard, Move previousMove){
+        StringBuilder stringBuilder = new StringBuilder();
+        for(Move move : currentBoard.getCurrentPlayer().getOpponent().getMyMoves()){
+            if(hasSameDestination(pgnMove, move, pgnMove.length()-2)){
+                stringBuilder.append(pgnMove.charAt(0));
+                if(Utils.getColumnNumber(move.getMovedPiece().getPiecePosition()) == Utils.getColumnNumber(previousMove.getMovedPiece().getPiecePosition())){
+                    stringBuilder.append(Utils.getAlgebraicRow(previousMove.getMovedPiece().getPiecePosition()));
+                } else {
+                    stringBuilder.append(Utils.getAlgebraicColumn(previousMove.getMovedPiece().getPiecePosition()));
+                }
+                for(int i = 1; i < pgnMove.length(); i++){
+                    stringBuilder.append(pgnMove.charAt(i));
+                }
+                return stringBuilder.toString();
+            }
+        }
+        return pgnMove;
+    }
+
 }
-
-/*
-[Event "F/S Return Match"]
-        [Site "Belgrade, Serbia JUG"]
-        [Date "1992.11.04"]
-        [Round "29"]
-        [White "Fischer, Robert J."]
-        [Black "Spassky, Boris V."]
-        [Result "1/2-1/2"]
-
-        1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3
-        O-O 9. h3 Nb8 10. d4 Nbd7 11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15.
-        Nb1 h6 16. Bh4 c5 17. dxe5 Nxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21.
-        Nc4 Nxc4 22. Bxc4 Nb6 23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7
-        27. Qe3 Qg5 28. Qxg5 hxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33.
-        f3 Bc8 34. Kf2 Bf5 35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5
-        40. Rd6 Kc5 41. Ra6 Nf2 42. g4 Bd3 43. Re6 1/2-1/2
-
-
- */
