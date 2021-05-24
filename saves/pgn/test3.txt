@@ -1,0 +1,9 @@
+[Event "A match"]
+[Site "Prague, Czech Republic CZ"]
+[Date "2021-05-24"]
+[Round "9"]
+[White "Some dude"]
+[Black "Some other dude"]
+[Result "*"]
+
+1. e4 Nc6 2. d4 Nf6 

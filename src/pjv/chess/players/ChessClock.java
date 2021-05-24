@@ -1,6 +1,7 @@
 package pjv.chess.players;
 
 import pjv.chess.gui.PlayerPanel;
+import pjv.chess.gui.Table;
 
 import javax.swing.*;
 import java.util.concurrent.Executors;
@@ -35,6 +36,10 @@ public class ChessClock implements Runnable{
             } else {
                 //System.out.println("Black has " + timeLeft + " seconds left");
                 playerPanel.update(this.timeLeft);
+            }
+            if(this.timeLeft <= 0){
+                requestStop();
+                JOptionPane.showMessageDialog(null, (this.alliance ? "White " : "Black ") + "player lost on time");
             }
         }
     }

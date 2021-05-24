@@ -17,7 +17,6 @@ public enum Utils {;
     public static int DEFAULT_TIME = 300;
     public static int DEFAULT_INCREMENT = 10;
 
-    public static String SAVE_PATH = "saves/";
 
     public static int getColumnNumber(int piecePosition){
         return piecePosition % 8 + 1;
@@ -42,7 +41,20 @@ public enum Utils {;
         int columnNumber = algebraicNotation.charAt(0) - 96;;
         int rowNumber = 57 - algebraicNotation.charAt(1);
 
-        return (columnNumber - 1) * 8 + rowNumber - 1;
+        return (rowNumber - 1) * 8 + columnNumber - 1;
+    }
+
+
+    public static String getAlgebraicColumn(int piecePosition){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(Character.toString((char) 96 + getColumnNumber(piecePosition)));
+        return stringBuilder.toString();
+    }
+
+    public static String getAlgebraicRow(int piecePosition){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(Character.toString((char) 57 - getRowNumber(piecePosition)));
+        return stringBuilder.toString();
     }
 
     public static Move getRandomMove(Board board){

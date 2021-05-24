@@ -6,6 +6,8 @@ import pjv.chess.pieces.*;
 
 public class FENUtils {
 
+    public static String SAVE_PATH = "saves/fen/";
+
     private FENUtils(){
         throw new RuntimeException("Not instantiable");
     }

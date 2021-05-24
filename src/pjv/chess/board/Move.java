@@ -1,8 +1,11 @@
 package pjv.chess.board;
 
+import jdk.jshell.execution.Util;
 import pjv.chess.pieces.ChessPiece;
 import pjv.chess.pieces.Pawn;
 import pjv.chess.pieces.Rook;
+
+import javax.swing.*;
 
 public abstract class Move {
 
@@ -19,6 +22,24 @@ public abstract class Move {
     }
 
     public abstract Board moveExecution();
+
+    public abstract boolean isDefaultMove();
+
+    public abstract boolean isAttackMove();
+
+    public abstract boolean isPawnMove();
+
+    public abstract boolean isPawnJump();
+
+    public abstract boolean isPawnAttackMove();
+
+    public abstract boolean isPawnPromotion();
+
+    public abstract boolean isEnPassant();
+
+    public abstract boolean isShortCastle();
+
+    public abstract boolean isLongCastle();
 
 
     public static class DefaultMove extends Move{
@@ -45,6 +66,71 @@ public abstract class Move {
             return builder.build();
         }
 
+        @Override
+        public boolean isDefaultMove() {
+            return true;
+        }
+
+        @Override
+        public boolean isAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnJump() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnPromotion() {
+            return false;
+        }
+
+        @Override
+        public boolean isEnPassant() {
+            return false;
+        }
+
+        @Override
+        public boolean isShortCastle() {
+            return false;
+        }
+
+        @Override
+        public boolean isLongCastle() {
+            return false;
+        }
+
+        @Override
+        public String toString(){
+            StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder.append(this.movedPiece.toString());
+            stringBuilder.append(checkDisambiguating());
+            stringBuilder.append(Utils.getAlgebraicNotation(getDestinationCoordinate()));
+
+            if (this.board.getCurrentPlayer().getOpponent().isInCheck()) {
+                if (this.board.getCurrentPlayer().getOpponent().isInCheckMate()) {
+                    stringBuilder.append("#");
+                } else {
+                    stringBuilder.append("+");
+                }
+            } else {
+                stringBuilder.append("");
+            }
+            return stringBuilder.toString();
+        }
+
     }
 
     public static class NullMove extends Move{
@@ -57,8 +143,52 @@ public abstract class Move {
         public Board moveExecution(){
             throw new RuntimeException("Null move is not executable");
         }
-    }
 
+        @Override
+        public boolean isDefaultMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnJump() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnPromotion() {
+            return false;
+        }
+
+        @Override
+        public boolean isEnPassant() {
+            return false;
+        }
+
+        @Override
+        public boolean isShortCastle() {
+            return false;
+        }
+
+        @Override
+        public boolean isLongCastle() {
+            return false;
+        }
+    }
 
     public static class AttackMove extends Move{
 
@@ -89,12 +219,140 @@ public abstract class Move {
             return builder.build();
         }
 
+        @Override
+        public boolean isDefaultMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isAttackMove() {
+            return true;
+        }
+
+        @Override
+        public boolean isPawnMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnJump() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnPromotion() {
+            return false;
+        }
+
+        @Override
+        public boolean isEnPassant() {
+            return false;
+        }
+
+        @Override
+        public boolean isShortCastle() {
+            return false;
+        }
+
+        @Override
+        public boolean isLongCastle() {
+            return false;
+        }
+
+        @Override
+        public String toString(){
+            StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder.append(this.movedPiece.toString());
+            stringBuilder.append(checkDisambiguating());
+            stringBuilder.append("x");
+            stringBuilder.append(Utils.getAlgebraicNotation(getDestinationCoordinate()));
+
+            if (this.board.getCurrentPlayer().getOpponent().isInCheck()) {
+                if (this.board.getCurrentPlayer().getOpponent().isInCheckMate()) {
+                    stringBuilder.append("#");
+                } else {
+                    stringBuilder.append("+");
+                }
+            } else {
+                stringBuilder.append("");
+            }
+            return stringBuilder.toString();
+        }
+
     }
 
     public static class PawnMove extends DefaultMove{
 
-        PawnMove(Board board, ChessPiece movedPiece, int pieceDestination) {
+        public PawnMove(Board board, ChessPiece movedPiece, int pieceDestination) {
             super(board, movedPiece, pieceDestination);
+        }
+
+        @Override
+        public String toString(){
+            StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder.append(Utils.getAlgebraicNotation(getDestinationCoordinate()));
+
+
+            if (this.board.getCurrentPlayer().getOpponent().isInCheck()) {
+                if (this.board.getCurrentPlayer().getOpponent().isInCheckMate()) {
+                    stringBuilder.append("#");
+                } else {
+                    stringBuilder.append("+");
+                }
+            } else {
+                stringBuilder.append("");
+            }
+            return stringBuilder.toString();
+        }
+        @Override
+        public boolean isDefaultMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnMove() {
+            return true;
+        }
+        @Override
+        public boolean isPawnJump() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnPromotion() {
+            return false;
+        }
+
+        @Override
+        public boolean isEnPassant() {
+            return false;
+        }
+
+        @Override
+        public boolean isShortCastle() {
+            return false;
+        }
+
+        @Override
+        public boolean isLongCastle() {
+            return false;
         }
     }
 
@@ -102,6 +360,7 @@ public abstract class Move {
 
         Move pawnMove;
         Pawn promotedPawn;
+        ChessPiece promotedPiece;
 
         public PawnPromotion(Move pawnMove) {
             super(pawnMove.getBoard() , pawnMove.getMovedPiece(), pawnMove.getDestinationCoordinate());
@@ -122,9 +381,74 @@ public abstract class Move {
             for(final ChessPiece piece : newBoard.getCurrentPlayer().getOpponentsPieces()){
                 builder.setPiece(piece);
             }
-            builder.setPiece(this.promotedPawn.getPromotedPiece().movePiece(this));
+            promotedPiece = this.promotedPawn.getPromotedPiece();
+            builder.setPiece(promotedPiece.movePiece(this));
             endTurn(builder);
             return builder.build();
+        }
+
+        @Override
+        public String toString(){
+            StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder.append(Utils.getAlgebraicNotation(getDestinationCoordinate()));
+            stringBuilder.append("=");
+            stringBuilder.append(promotedPiece.toString());
+
+            if (this.board.getCurrentPlayer().getOpponent().isInCheck()) {
+                if(this.board.getCurrentPlayer().getOpponent().isInCheckMate()){
+                    stringBuilder.append("#");
+                } else {
+                    stringBuilder.append("+");
+                }
+            } else {
+                stringBuilder.append("");
+            }
+            return stringBuilder.toString();
+        }
+        @Override
+        public boolean isDefaultMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnJump() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnPromotion() {
+            return true;
+        }
+
+        @Override
+        public boolean isEnPassant() {
+            return false;
+        }
+
+        @Override
+        public boolean isShortCastle() {
+            return false;
+        }
+
+        @Override
+        public boolean isLongCastle() {
+            return false;
         }
     }
 
@@ -153,12 +477,170 @@ public abstract class Move {
             endTurn(builder);
             return builder.build();
         }
+        @Override
+        public boolean isDefaultMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnMove() {
+            return true;
+        }
+
+        @Override
+        public boolean isPawnJump() {
+            return true;
+        }
+
+        @Override
+        public boolean isPawnAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnPromotion() {
+            return false;
+        }
+
+        @Override
+        public boolean isEnPassant() {
+            return false;
+        }
+
+        @Override
+        public boolean isShortCastle() {
+            return false;
+        }
+
+        @Override
+        public boolean isLongCastle() {
+            return false;
+        }
     }
 
-    public static class PawnEnPassant extends AttackMove{
+    public static class PawnAttackMove extends AttackMove{
+
+        public PawnAttackMove(Board board, ChessPiece movedPiece, int pieceDestination, ChessPiece attackedPiece) {
+            super(board, movedPiece, pieceDestination, attackedPiece);
+        }
+
+        public String toString(){
+            StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder.append(Utils.getAlgebraicColumn(this.movedPiece.getPiecePosition()));
+            stringBuilder.append("x");
+            stringBuilder.append(Utils.getAlgebraicNotation(getDestinationCoordinate()));
+
+            if (this.board.getCurrentPlayer().getOpponent().isInCheck()) {
+                if (this.board.getCurrentPlayer().getOpponent().isInCheckMate()) {
+                    stringBuilder.append("#");
+                } else {
+                    stringBuilder.append("+");
+                }
+            } else {
+                stringBuilder.append("");
+            }
+            return stringBuilder.toString();
+        }
+        @Override
+        public boolean isDefaultMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnJump() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnAttackMove() {
+            return true;
+        }
+
+        @Override
+        public boolean isPawnPromotion() {
+            return false;
+        }
+
+        @Override
+        public boolean isEnPassant() {
+            return false;
+        }
+
+        @Override
+        public boolean isShortCastle() {
+            return false;
+        }
+
+        @Override
+        public boolean isLongCastle() {
+            return false;
+        }
+    }
+
+    public static class PawnEnPassant extends PawnAttackMove{
 
         public PawnEnPassant(Board board, ChessPiece movedPiece, int pieceDestination, ChessPiece attackedPiece) {
             super(board, movedPiece, pieceDestination, attackedPiece);
+        }
+        @Override
+        public boolean isDefaultMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnJump() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnPromotion() {
+            return false;
+        }
+
+        @Override
+        public boolean isEnPassant() {
+            return true;
+        }
+
+        @Override
+        public boolean isShortCastle() {
+            return false;
+        }
+
+        @Override
+        public boolean isLongCastle() {
+            return false;
         }
     }
 
@@ -200,7 +682,52 @@ public abstract class Move {
             endTurn(builder);
             return builder.build();
         }
-    }
+
+       @Override
+       public boolean isDefaultMove() {
+           return false;
+       }
+
+       @Override
+       public boolean isAttackMove() {
+           return false;
+       }
+
+       @Override
+       public boolean isPawnMove() {
+           return false;
+       }
+
+       @Override
+       public boolean isPawnJump() {
+           return false;
+       }
+
+       @Override
+       public boolean isPawnAttackMove() {
+           return false;
+       }
+
+       @Override
+       public boolean isPawnPromotion() {
+           return false;
+       }
+
+       @Override
+       public boolean isEnPassant() {
+           return false;
+       }
+
+       @Override
+       public boolean isShortCastle() {
+           return false;
+       }
+
+       @Override
+       public boolean isLongCastle() {
+           return false;
+       }
+   }
 
     public static class ShortCastleMove extends CastleMove {
         Rook castleRook;
@@ -239,6 +766,66 @@ public abstract class Move {
             builder.setPiece(new Rook(this.casteRookDestination, this.castleRook.getPieceAlliance()));
             endTurn(builder);
             return builder.build();
+        }
+        @Override
+        public String toString() {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("O-O");
+
+            if (this.board.getCurrentPlayer().getOpponent().isInCheck()) {
+                if (this.board.getCurrentPlayer().getOpponent().isInCheckMate()) {
+                    stringBuilder.append("#");
+                } else {
+                    stringBuilder.append("+");
+                }
+            } else {
+                stringBuilder.append("");
+            }
+            return stringBuilder.toString();
+        }
+        @Override
+        public boolean isDefaultMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnJump() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnPromotion() {
+            return false;
+        }
+
+        @Override
+        public boolean isEnPassant() {
+            return false;
+        }
+
+        @Override
+        public boolean isShortCastle() {
+            return true;
+        }
+
+        @Override
+        public boolean isLongCastle() {
+            return false;
         }
     }
 
@@ -280,6 +867,66 @@ public abstract class Move {
             endTurn(builder);
             return builder.build();
         }
+        @Override
+        public String toString(){
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("O-O-O");
+
+            if (this.board.getCurrentPlayer().getOpponent().isInCheck()) {
+                if(this.board.getCurrentPlayer().getOpponent().isInCheckMate()){
+                    stringBuilder.append("#");
+                } else {
+                    stringBuilder.append("+");
+                }
+            } else {
+                stringBuilder.append("");
+            }
+            return stringBuilder.toString();
+        }
+        @Override
+        public boolean isDefaultMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnJump() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnAttackMove() {
+            return false;
+        }
+
+        @Override
+        public boolean isPawnPromotion() {
+            return false;
+        }
+
+        @Override
+        public boolean isEnPassant() {
+            return false;
+        }
+
+        @Override
+        public boolean isShortCastle() {
+            return false;
+        }
+
+        @Override
+        public boolean isLongCastle() {
+            return true;
+        }
     }
 
 
@@ -298,6 +945,29 @@ public abstract class Move {
     public boolean isAttack(){ return false; }
 
     public boolean isCastlingMove(){ return false; }
+
+    public String checkDisambiguating(){
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean rowAppended = false;
+        boolean columnAppended = false;
+
+        for(Move move : this.board.getCurrentPlayer().getMyMoves()){
+            ChessPiece other = move.getMovedPiece();
+            if ((getDestinationCoordinate() == move.getDestinationCoordinate()) &&
+                    (this.movedPiece.toString() == other.toString()) &&
+                    (this.movedPiece.getPiecePosition() != other.getPiecePosition())) {
+                if(Utils.getRowNumber(movedPiece.getPiecePosition()) == Utils.getRowNumber(other.getPiecePosition()) && !columnAppended){
+                    stringBuilder.append(Utils.getAlgebraicColumn(this.movedPiece.getPiecePosition()));
+                    columnAppended = true;
+                }
+                if(Utils.getColumnNumber(movedPiece.getPiecePosition()) == Utils.getColumnNumber(other.getPiecePosition()) && !rowAppended){
+                    stringBuilder.append(Utils.getAlgebraicRow(this.movedPiece.getPiecePosition()));
+                    rowAppended = true;
+                }
+            }
+        }
+        return stringBuilder.toString();
+    }
 
     public void endTurn(Board.Builder builder){
 
