@@ -287,8 +287,6 @@ public class Table {
                         Table.get().setCustomizeChessBoard(false);
                         chessBoard.getWhitePlayer().setPlayerPanel(whitePlayerPanel);
                         chessBoard.getBlackPlayer().setPlayerPanel(blackPlayerPanel);
-
-
                     }
                 });
                 whitePlayerPanel.add(startButton);
@@ -305,9 +303,17 @@ public class Table {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String fenCode = JOptionPane.showInputDialog("Type or copy a standard FEN code");
+                String fenCodeFile = JOptionPane.showInputDialog("Type name of your save (format \"your input\".txt)");
+                String fenCode = null;
+
                 Table.get().getGameBoard().getWhitePlayer().stopClock();
                 Table.get().getGameBoard().getBlackPlayer().stopClock();
+
+                try {
+                    fenCode = Files.readString(Path.of(FENUtils.SAVE_PATH + fenCodeFile + ".txt"));
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
 
                 PlayerPanel whitePlayerPanel = Table.get().getGameBoard().getWhitePlayer().getPlayerPanel();
                 PlayerPanel blackPlayerPanel = Table.get().getGameBoard().getBlackPlayer().getPlayerPanel();
