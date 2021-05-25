@@ -471,6 +471,8 @@ public class Table {
                         if(exploredGamePosition > 0){
                             exploredGamePosition--;
                             chessBoard = exploredGame.get(exploredGamePosition);
+                            System.out.println(chessBoard.toString());
+                            System.out.println(PGNUtils.getMoveFromPGN("g6", false, chessBoard));
                             Table.get().getBoardPanel().drawBoard(chessBoard);
                         }
                     }

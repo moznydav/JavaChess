@@ -11,8 +11,6 @@ import java.util.List;
 public class Rook extends ChessPiece{
     private final static int[] MOVE_OFFSETS = {-8, -1, 1, 8}; //offsets from current location for "rook move"
 
-    boolean firstMove = true;
-
     public Rook(int piecePosition, boolean alliance) {
         super(piecePosition, alliance, true);
     }

@@ -3,6 +3,7 @@ package pjv.chess.board;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -72,7 +73,11 @@ public class PGNUtils {
     public static List<Board> createExploreGameFromPGN(String pgnString){
         List<Board> allBoards = new ArrayList<>();
         allBoards.add(Board.createStandardBoard());
-        String[] pgnMoves = tokenizePGN(pgnString)[tokenizePGN(pgnString).length-1].split("\\s");
+
+
+        String[] pgnMoves = tokenizePGN(pgnString);
+
+
         int itemCount = 0;
         int halfMoveCount = 0;
         boolean isCurrentPlayerWhite = true;
@@ -81,21 +86,27 @@ public class PGNUtils {
         for(String moveString : pgnMoves){
             itemCount++;
             if(itemCount % 3 != 1){
+                if(!moveString.equals("0-1") && !moveString.equals("1/2-1/2") && !moveString.equals("1-0")){
+                    //System.out.println(getMoveFromPGN(moveString, isCurrentPlayerWhite, allBoards.get(halfMoveCount)));
+                    System.out.println(moveString);
 
-                BoardTransition transition = allBoards.get(halfMoveCount).getCurrentPlayer().makeMove(getMoveFromPGN(moveString,
-                        isCurrentPlayerWhite, allBoards.get(halfMoveCount)));
 
-                allBoards.add(transition.getNewBoard());
+                    BoardTransition transition = allBoards.get(halfMoveCount).getCurrentPlayer().makeMove(getMoveFromPGN(moveString,
+                            isCurrentPlayerWhite, allBoards.get(halfMoveCount)));
 
-                halfMoveCount++;
-                isCurrentPlayerWhite = !isCurrentPlayerWhite;
+                    allBoards.add(transition.getNewBoard());
+
+                    halfMoveCount++;
+                    isCurrentPlayerWhite = !isCurrentPlayerWhite;
+                }
+
             }
         }
 
         return allBoards;
     }
 
-    private static Move getMoveFromPGN(String pgnString, boolean isCurrentPlayerWhite, Board currentBoard){
+    public static Move getMoveFromPGN(String pgnString, boolean isCurrentPlayerWhite, Board currentBoard){
         int moveLength = pgnString.length();
         if(pgnString.charAt(moveLength-1) == '+'){ //'+' doesn't help me
             moveLength--;
@@ -234,7 +245,7 @@ public class PGNUtils {
                             if(isInCorrectColumn(pgnString, move, 0) && hasSameDestination(pgnString, move, 2) && pgnString.charAt(1) == 'x'){
                                 return move;
                             } else if(hasSameDestination(pgnString, move, 0)){
-                                return move;
+                                return new Move.PawnPromotion(move, pgnString.charAt(3));
                             }
                         }
                 }
@@ -316,8 +327,13 @@ public class PGNUtils {
     }
 
     private static String[] tokenizePGN(String pgnString){
-        String[] tokenizedPGN = pgnString.split("\n");
-        return tokenizedPGN;
+        String[] tokenizedPGN = pgnString.split("]"); //info tokens + moves(last)
+
+        String movesString = tokenizedPGN[tokenizedPGN.length-1].replace("\n"," ").replace("\r","");
+
+        String[] pgnMoves = movesString.split("\\s");
+
+        return Arrays.copyOfRange(pgnMoves, 2, pgnMoves.length);
     }
 
     private static boolean getCurrentPlayer(String pgnString){

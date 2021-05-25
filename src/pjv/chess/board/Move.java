@@ -3,6 +3,7 @@ package pjv.chess.board;
 import jdk.jshell.execution.Util;
 import pjv.chess.pieces.ChessPiece;
 import pjv.chess.pieces.Pawn;
+import pjv.chess.pieces.Queen;
 import pjv.chess.pieces.Rook;
 
 import javax.swing.*;
@@ -361,9 +362,17 @@ public abstract class Move {
         Move pawnMove;
         Pawn promotedPawn;
         ChessPiece promotedPiece;
+        char promotedPieceSign;
 
         public PawnPromotion(Move pawnMove) {
             super(pawnMove.getBoard() , pawnMove.getMovedPiece(), pawnMove.getDestinationCoordinate());
+            this.pawnMove = pawnMove;
+            this.promotedPawn = (Pawn) pawnMove.getMovedPiece();
+            this.promotedPieceSign = 'P';
+        }
+        public PawnPromotion(Move pawnMove, char promotedPieceSign){
+            super(pawnMove.getBoard() , pawnMove.getMovedPiece(), pawnMove.getDestinationCoordinate());
+            this.promotedPieceSign = promotedPieceSign;
             this.pawnMove = pawnMove;
             this.promotedPawn = (Pawn) pawnMove.getMovedPiece();
         }
@@ -381,7 +390,7 @@ public abstract class Move {
             for(final ChessPiece piece : newBoard.getCurrentPlayer().getOpponentsPieces()){
                 builder.setPiece(piece);
             }
-            promotedPiece = this.promotedPawn.getPromotedPiece();
+            promotedPiece = this.promotedPawn.getPromotedPiece(promotedPieceSign);
             builder.setPiece(promotedPiece.movePiece(this));
             endTurn(builder);
             return builder.build();

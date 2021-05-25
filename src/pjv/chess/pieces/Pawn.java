@@ -114,22 +114,33 @@ public class Pawn extends ChessPiece{
         } else { return false; }
     }
 
-    public ChessPiece getPromotedPiece(){
+    public ChessPiece getPromotedPiece(char promotedPieceSign){
         //TODO optional autopromote
-        String[] options = {"Queen", "Knight", "Rook", "Bishop"};
-
-        int input = JOptionPane.showOptionDialog(null, "Select piece to promote into", "Select piece",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
-
-        switch(input){
-            case 0:
+        switch (promotedPieceSign){
+            case 'Q':
                 return new Queen(this.piecePosition, this.getPieceAlliance());
-            case 1:
+            case 'N':
                 return new Knight(this.piecePosition, this.getPieceAlliance());
-            case 2:
+            case 'R':
                 return new Rook(this.piecePosition, this.getPieceAlliance());
-            case 3:
+            case 'B':
                 return new Bishop(this.piecePosition, this.getPieceAlliance());
+            default:
+                String[] options = {"Queen", "Knight", "Rook", "Bishop"};
+
+                int input = JOptionPane.showOptionDialog(null, "Select piece to promote into", "Select piece",
+                        JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+
+                switch(input){
+                    case 0:
+                        return new Queen(this.piecePosition, this.getPieceAlliance());
+                    case 1:
+                        return new Knight(this.piecePosition, this.getPieceAlliance());
+                    case 2:
+                        return new Rook(this.piecePosition, this.getPieceAlliance());
+                    case 3:
+                        return new Bishop(this.piecePosition, this.getPieceAlliance());
+                }
         }
         return new Queen(this.piecePosition, this.getPieceAlliance());
     }
