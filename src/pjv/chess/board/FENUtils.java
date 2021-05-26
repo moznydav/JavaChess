@@ -119,7 +119,7 @@ public class FENUtils {
         return builder.build();
     }
 
-    public static String[] tokenizeFEN(String fenString){
+    private static String[] tokenizeFEN(String fenString){
         String[] tokenizedFEN = fenString.split("\\s");
         return tokenizedFEN;
     }

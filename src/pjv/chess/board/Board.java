@@ -184,30 +184,7 @@ public class Board {
         return builder.build();
     }
 
-
-    public static Board createBoardFromFEN(String FEN){
-        return FENUtils.createGameFromFEN(FEN);
-    }
-
-    public void setBlackPanel(PlayerPanel blackPlayerPanel){
-        this.blackPlayerPanel = blackPlayerPanel;
-    }
-    public void setWhitePanel(PlayerPanel whitePlayerPanel){
-        this.whitePlayerPanel = whitePlayerPanel;
-    }
-
-    public void setWhitePlayerAI(boolean state){
-        this.whitePlayerAI = state;
-    }
-
-    public void setBlackPlayerAI(boolean state){
-        this.blackPlayerAI = state;
-    }
-
-    public Tile getTile(int tileCoord){
-
-        return chessBoard.get(tileCoord);
-    }
+    public Tile getTile(int tileCoord){ return chessBoard.get(tileCoord); }
 
     public int getWhiteTime(){ return this.whiteTime; }
 

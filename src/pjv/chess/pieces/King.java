@@ -59,10 +59,6 @@ public class King extends ChessPiece{
         return new King(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance(), false);
     }
 
-    public void addCastleMoves(Collection<Move> castleMoves){
-
-    }
-
     private boolean isOverEdgeMove(int piecePosition, int offset){
 
         int columnNumber = Utils.getColumnNumber(piecePosition);

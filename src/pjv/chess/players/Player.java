@@ -53,17 +53,7 @@ public class Player {
         throw new RuntimeException("Invalid board, player has no King");
     }
 
-    public Collection<Move> cutLegalMoves(Collection<Move> legalMoves){
-        BoardTransition newBoard;
-        Collection<Move> cutMoves = new ArrayList<>();
-        for(Move move : legalMoves){
-            newBoard = makeMove(move);
-            if(newBoard.getMoveStatus().isDone()){
-                cutMoves.add(move);
-            }
-        }
-        return cutMoves;
-    }
+
 
 
     //all getters
@@ -128,7 +118,7 @@ public class Player {
         return this.myMoves.contains(move);
     }
 
-    public boolean isLegalForCastling(Tile checkedTile, Collection<Move> opponentLegalMoves){
+    private boolean isLegalForCastling(Tile checkedTile, Collection<Move> opponentLegalMoves){
         if(checkedTile.isEmpty() && Player.calculateAttacksOnTile(checkedTile.getTileCoordinates(), opponentLegalMoves).isEmpty()){
             return true;
         } else {

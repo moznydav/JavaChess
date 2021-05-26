@@ -74,8 +74,6 @@ public class Table {
         this.chessBoard = Board.createStandardBoard();
         this.moveLog = new ArrayList<>();
         this.result = 3;
-        //this.chessBoard = Board.createBoardFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0, 1");
-        //System.out.println(FENUtils.saveGameToFEN(this.chessBoard));
 
         this.gameFrame = new JFrame("Chess");
         this.gameFrame.setLayout(new BorderLayout());
