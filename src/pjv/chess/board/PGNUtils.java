@@ -20,12 +20,23 @@ public class PGNUtils {
     private PGNUtils(){ throw new RuntimeException("Not instiable"); }
 
 
-
+    /**
+     * Creates board from PGN code
+     * @param pgnString
+     * @return new Board
+     */
     public static Board createGameFromPGN(String pgnString){
         List<Board> allBoards = createExploreGameFromPGN(pgnString);
         return allBoards.get(allBoards.size() - 1);
     }
 
+    /**
+     * Saves move log to pgn string
+     *
+     * @param moveLog
+     * @param whiteGain
+     * @return pgn string
+     */
     public static String saveGameToPGN(List<String> moveLog, int whiteGain){ //white gain = 0 - white lost, 1 - draw, 2  - win
         StringBuilder stringBuilder = new StringBuilder();
         String result;
@@ -69,7 +80,11 @@ public class PGNUtils {
         return stringBuilder.toString();
     }
 
-
+    /**
+     * Creates list of board for player to explore
+     * @param pgnString
+     * @return list of boards
+     */
     public static List<Board> createExploreGameFromPGN(String pgnString){
         List<Board> allBoards = new ArrayList<>();
         allBoards.add(Board.createStandardBoard());
@@ -106,6 +121,14 @@ public class PGNUtils {
         return allBoards;
     }
 
+    /**
+     * Main method for getting move that was given by pgn string
+     *
+     * @param pgnString
+     * @param isCurrentPlayerWhite
+     * @param currentBoard
+     * @return move
+     */
     public static Move getMoveFromPGN(String pgnString, boolean isCurrentPlayerWhite, Board currentBoard){
         int moveLength = pgnString.length();
         if(pgnString.charAt(moveLength-1) == '+'){ //'+' doesn't help me
@@ -336,17 +359,14 @@ public class PGNUtils {
         return Arrays.copyOfRange(pgnMoves, 2, pgnMoves.length);
     }
 
-    private static boolean getCurrentPlayer(String pgnString){
-        String[] pgnMoves = tokenizePGN(pgnString)[tokenizePGN(pgnString).length-1].split("\\s");
-
-        if(pgnMoves[pgnMoves.length-1] == "0-1" ||
-                pgnMoves[pgnMoves.length-1] == "1-0" ||
-                pgnMoves[pgnMoves.length-1] == "1/2-1/2"){
-            return !(pgnMoves.length % 3 == 0);
-        }
-        return pgnMoves.length % 3 == 0;
-    }
-
+    /**
+     * Checks move for disambiguating state
+     *
+     * @param pgnMove
+     * @param currentBoard
+     * @param previousMove
+     * @return checked move pgn code
+     */
     public static String checkedPGNMove(String pgnMove, Board currentBoard, Move previousMove){
         StringBuilder stringBuilder = new StringBuilder();
         for(Move move : currentBoard.getCurrentPlayer().getOpponent().getMyMoves()){

@@ -8,6 +8,11 @@ import pjv.chess.pieces.Rook;
 
 import javax.swing.*;
 
+/**
+ * Handles all move related things
+ *
+ * @author David Mozny
+ */
 public abstract class Move {
 
     Board board;
@@ -22,27 +27,21 @@ public abstract class Move {
         this.pieceDestination = pieceDestination;
     }
 
+    /**
+     * This is the main method of move class that hadles all things move related and makes new board that is the result of given move
+     * @return new Board
+     */
     public abstract Board moveExecution();
 
-    public abstract boolean isDefaultMove();
-
-    public abstract boolean isAttackMove();
-
     public abstract boolean isPawnMove();
-
-    public abstract boolean isPawnJump();
-
-    public abstract boolean isPawnAttackMove();
-
-    public abstract boolean isPawnPromotion();
-
-    public abstract boolean isEnPassant();
 
     public abstract boolean isShortCastle();
 
     public abstract boolean isLongCastle();
 
-
+    /**
+     * Extension of move that handles basic move
+     */
     public static class DefaultMove extends Move{
 
         public DefaultMove(Board board, ChessPiece movedPiece, int pieceDestination) {
@@ -68,37 +67,7 @@ public abstract class Move {
         }
 
         @Override
-        public boolean isDefaultMove() {
-            return true;
-        }
-
-        @Override
-        public boolean isAttackMove() {
-            return false;
-        }
-
-        @Override
         public boolean isPawnMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnJump() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnAttackMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnPromotion() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnPassant() {
             return false;
         }
 
@@ -134,6 +103,9 @@ public abstract class Move {
 
     }
 
+    /**
+     * Extension of move that handles move that is invalid
+     */
     public static class NullMove extends Move{
 
         NullMove() {
@@ -146,37 +118,7 @@ public abstract class Move {
         }
 
         @Override
-        public boolean isDefaultMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isAttackMove() {
-            return false;
-        }
-
-        @Override
         public boolean isPawnMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnJump() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnAttackMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnPromotion() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnPassant() {
             return false;
         }
 
@@ -191,6 +133,9 @@ public abstract class Move {
         }
     }
 
+    /**
+     * Extension of move that handles attack move
+     */
     public static class AttackMove extends Move{
 
         ChessPiece attackedPiece;
@@ -221,37 +166,7 @@ public abstract class Move {
         }
 
         @Override
-        public boolean isDefaultMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isAttackMove() {
-            return true;
-        }
-
-        @Override
         public boolean isPawnMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnJump() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnAttackMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnPromotion() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnPassant() {
             return false;
         }
 
@@ -288,6 +203,9 @@ public abstract class Move {
 
     }
 
+    /**
+     * Extension of move that handles basic pawn move
+     */
     public static class PawnMove extends DefaultMove{
 
         public PawnMove(Board board, ChessPiece movedPiece, int pieceDestination) {
@@ -312,38 +230,10 @@ public abstract class Move {
             }
             return stringBuilder.toString();
         }
-        @Override
-        public boolean isDefaultMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isAttackMove() {
-            return false;
-        }
 
         @Override
         public boolean isPawnMove() {
             return true;
-        }
-        @Override
-        public boolean isPawnJump() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnAttackMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnPromotion() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnPassant() {
-            return false;
         }
 
         @Override
@@ -357,6 +247,9 @@ public abstract class Move {
         }
     }
 
+    /**
+     * Extension of move that handles pawn promotion move
+     */
     public static class PawnPromotion extends PawnMove{
 
         Move pawnMove;
@@ -415,38 +308,9 @@ public abstract class Move {
             }
             return stringBuilder.toString();
         }
-        @Override
-        public boolean isDefaultMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isAttackMove() {
-            return false;
-        }
 
         @Override
         public boolean isPawnMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnJump() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnAttackMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnPromotion() {
-            return true;
-        }
-
-        @Override
-        public boolean isEnPassant() {
             return false;
         }
 
@@ -461,6 +325,9 @@ public abstract class Move {
         }
     }
 
+    /**
+     * Extension of move that handles pawn jump
+     */
     public static class PawnJump extends PawnMove{
 
         public PawnJump(Board board, ChessPiece movedPiece, int pieceDestination) {
@@ -486,39 +353,10 @@ public abstract class Move {
             endTurn(builder);
             return builder.build();
         }
-        @Override
-        public boolean isDefaultMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isAttackMove() {
-            return false;
-        }
 
         @Override
         public boolean isPawnMove() {
             return true;
-        }
-
-        @Override
-        public boolean isPawnJump() {
-            return true;
-        }
-
-        @Override
-        public boolean isPawnAttackMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnPromotion() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnPassant() {
-            return false;
         }
 
         @Override
@@ -532,6 +370,9 @@ public abstract class Move {
         }
     }
 
+    /**
+     * Extension of move that handles pawn attack move
+     */
     public static class PawnAttackMove extends AttackMove{
 
         public PawnAttackMove(Board board, ChessPiece movedPiece, int pieceDestination, ChessPiece attackedPiece) {
@@ -556,38 +397,9 @@ public abstract class Move {
             }
             return stringBuilder.toString();
         }
-        @Override
-        public boolean isDefaultMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isAttackMove() {
-            return false;
-        }
 
         @Override
         public boolean isPawnMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnJump() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnAttackMove() {
-            return true;
-        }
-
-        @Override
-        public boolean isPawnPromotion() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnPassant() {
             return false;
         }
 
@@ -602,44 +414,18 @@ public abstract class Move {
         }
     }
 
+    /**
+     * Extension of move that handles pawn en passant move
+     */
     public static class PawnEnPassant extends PawnAttackMove{
 
         public PawnEnPassant(Board board, ChessPiece movedPiece, int pieceDestination, ChessPiece attackedPiece) {
             super(board, movedPiece, pieceDestination, attackedPiece);
         }
-        @Override
-        public boolean isDefaultMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isAttackMove() {
-            return false;
-        }
 
         @Override
         public boolean isPawnMove() {
             return false;
-        }
-
-        @Override
-        public boolean isPawnJump() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnAttackMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnPromotion() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnPassant() {
-            return true;
         }
 
         @Override
@@ -653,6 +439,9 @@ public abstract class Move {
         }
     }
 
+    /**
+     * Extension of move that handles castle move
+     */
    public static class CastleMove extends Move {
         Rook castleRook;
         int castleRookPosition;
@@ -664,14 +453,6 @@ public abstract class Move {
             this.castleRook = castleRook;
             this.castleRookPosition = castleRookPosition;
             this.casteRookDestination = casteRookDestination;
-        }
-
-        public Rook getCastleRook(){
-            return this.castleRook;
-        }
-        @Override
-        public boolean isCastlingMove(){
-            return true;
         }
 
         @Override
@@ -693,37 +474,7 @@ public abstract class Move {
         }
 
        @Override
-       public boolean isDefaultMove() {
-           return false;
-       }
-
-       @Override
-       public boolean isAttackMove() {
-           return false;
-       }
-
-       @Override
        public boolean isPawnMove() {
-           return false;
-       }
-
-       @Override
-       public boolean isPawnJump() {
-           return false;
-       }
-
-       @Override
-       public boolean isPawnAttackMove() {
-           return false;
-       }
-
-       @Override
-       public boolean isPawnPromotion() {
-           return false;
-       }
-
-       @Override
-       public boolean isEnPassant() {
            return false;
        }
 
@@ -738,6 +489,9 @@ public abstract class Move {
        }
    }
 
+    /**
+     * Extension of move that handles short castle
+     */
     public static class ShortCastleMove extends CastleMove {
         Rook castleRook;
         int castleRookPosition;
@@ -749,14 +503,6 @@ public abstract class Move {
             this.castleRook = castleRook;
             this.castleRookPosition = castleRookPosition;
             this.casteRookDestination = casteRookDestination;
-        }
-
-        public Rook getCastleRook(){
-            return this.castleRook;
-        }
-        @Override
-        public boolean isCastlingMove(){
-            return true;
         }
 
         @Override
@@ -793,37 +539,7 @@ public abstract class Move {
             return stringBuilder.toString();
         }
         @Override
-        public boolean isDefaultMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isAttackMove() {
-            return false;
-        }
-
-        @Override
         public boolean isPawnMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnJump() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnAttackMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnPromotion() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnPassant() {
             return false;
         }
 
@@ -838,6 +554,9 @@ public abstract class Move {
         }
     }
 
+    /**
+     * Extension of move that handles long castle move
+     */
     public static class LongCastleMove extends CastleMove {
         Rook castleRook;
         int castleRookPosition;
@@ -849,14 +568,6 @@ public abstract class Move {
             this.castleRook = castleRook;
             this.castleRookPosition = castleRookPosition;
             this.casteRookDestination = casteRookDestination;
-        }
-
-        public Rook getCastleRook(){
-            return this.castleRook;
-        }
-        @Override
-        public boolean isCastlingMove(){
-            return true;
         }
 
         @Override
@@ -893,37 +604,7 @@ public abstract class Move {
             return stringBuilder.toString();
         }
         @Override
-        public boolean isDefaultMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isAttackMove() {
-            return false;
-        }
-
-        @Override
         public boolean isPawnMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnJump() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnAttackMove() {
-            return false;
-        }
-
-        @Override
-        public boolean isPawnPromotion() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnPassant() {
             return false;
         }
 
@@ -939,22 +620,23 @@ public abstract class Move {
     }
 
 
-    public int getCurrentCoordinate(){
-        return this.getMovedPiece().getPiecePosition();
-    }
+    /**
+     * getter methods for Move class
+     */
+    public int getCurrentCoordinate(){ return this.getMovedPiece().getPiecePosition(); }
 
-    public int getDestinationCoordinate(){
-        return this.pieceDestination;
-    }
+    public int getDestinationCoordinate(){ return this.pieceDestination; }
 
     public ChessPiece getMovedPiece(){ return this.movedPiece; }
 
     public Board getBoard(){ return this.board; }
 
-    public boolean isAttack(){ return false; }
 
-    public boolean isCastlingMove(){ return false; }
-
+    /**
+     * Checks if move is disambiguating and returns string that disapproves that disambiguity
+     *
+     * @returns specific piece coordinate
+     */
     public String checkDisambiguating(){
         StringBuilder stringBuilder = new StringBuilder();
         boolean rowAppended = false;
@@ -978,6 +660,11 @@ public abstract class Move {
         return stringBuilder.toString();
     }
 
+    /**
+     * Handles turn between Boards using Builder class
+     *
+     * @param builder
+     */
     public void endTurn(Board.Builder builder){
 
         if(board.getCurrentPlayer().getAlliance()){
@@ -992,6 +679,11 @@ public abstract class Move {
         builder.setNextTurn(this.board.getCurrentPlayer().getOpponent().getAlliance());
     }
 
+    /**
+     * This enum holds status of moves that helps exclude invalid moves from executing
+     *
+     * @author David Mozny
+     */
     public enum MoveStatus {
 
         DONE {
@@ -1050,6 +742,11 @@ public abstract class Move {
         public abstract boolean isCheck();
     }
 
+    /**
+     * This class helps ease up move creation
+     *
+     * @author David Mozny
+     */
     public static class moveMaker{
         public static Move createMove(Board board, int pieceCoordinate, int destinationCoordinate) {
             for (Move move : board.getAllLegalMoves()){

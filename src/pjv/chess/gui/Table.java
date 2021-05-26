@@ -20,6 +20,11 @@ import java.util.List;
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
 
+/**
+ * Main GUI class that handles all user interface and interaction with app
+ *
+ * @author David Mozny
+ */
 public class Table {
 
     private JFrame gameFrame;
@@ -101,6 +106,10 @@ public class Table {
 
     }
 
+    /**
+     * All getters and setters of Table class
+     * @return
+     */
     public static Table get(){return INSTANCE;}
 
     private BoardTablePanel getBoardPanel() {
@@ -110,10 +119,6 @@ public class Table {
     private Board getGameBoard() {
         return this.chessBoard;
     }
-
-    private PlayerPanel getWhitePlayerPanel(){ return whitePlayerPanel;}
-
-    private PlayerPanel getBlackPlayerPanel(){ return blackPlayerPanel;}
 
     private void setWhitePlayerAI(boolean value){ this.whitePlayerAI = value; }
 
@@ -127,17 +132,18 @@ public class Table {
 
     private boolean getHighlightLegalMoves(){ return this.highlightLegalMoves; }
 
-    private boolean getCustomizeChessBoard(){ return this.customizeChessBoard; }
-
     private void setCustomizeChessBoard(boolean value){ this.customizeChessBoard = value; }
 
     private int getResult(){ return this.result;}
 
+    /**
+     * Method used by ChessGame class which starts the game and shows Table GUI
+     */
     public void show() {
         Table.get().getBoardPanel().drawBoard(Table.get().getGameBoard());
     }
 
-    public void checkmatePopUpWindow(boolean alliance){
+    private void checkmatePopUpWindow(boolean alliance){
         int input = JOptionPane.showConfirmDialog(null, (alliance ? "Black " : "White ") + "player won by checkmate\n" +
                 "Do you want to create a new game?", "Checkmate", JOptionPane.YES_NO_OPTION);
         if(input == JOptionPane.YES_OPTION){
@@ -145,7 +151,7 @@ public class Table {
         }
     }
 
-    public void staleMatePopUpWindow(){
+    private void staleMatePopUpWindow(){
         int input = JOptionPane.showConfirmDialog(null, "Draw by stalemate\n" +
                 "Do you want to create a new game?", "Stalemate", JOptionPane.YES_NO_OPTION);
         if(input == JOptionPane.YES_OPTION){
@@ -153,7 +159,7 @@ public class Table {
         }
     }
 
-    public void endGameCheck(Player currentPlayer){
+    private void endGameCheck(Player currentPlayer){
         if(currentPlayer.isInCheckMate()){
             this.result = currentPlayer.getAlliance() ? 0 : 2;
             SwingUtilities.invokeLater(new Runnable() {
@@ -175,7 +181,7 @@ public class Table {
         }
     }
 
-    public void setUpNextGame(){
+    private void setUpNextGame(){
         Table.get().getGameBoard().getWhitePlayer().stopClock();
         Table.get().getGameBoard().getBlackPlayer().stopClock();
 
@@ -206,6 +212,10 @@ public class Table {
         //White Player AI
         JCheckBoxMenuItem whitePlayerAI = new JCheckBoxMenuItem("White player AI", false);
         whitePlayerAI.addItemListener(new ItemListener() {
+            /**
+             * Changes state which holds whitePlayer AI on item state change
+             * @param e
+             */
             @Override
             public void itemStateChanged(ItemEvent e) {
                 Table.get().setWhitePlayerAI(!Table.get().getWhitePlayerAI());
@@ -217,6 +227,10 @@ public class Table {
         //Black Player AI
         JCheckBoxMenuItem blackPlayerAI = new JCheckBoxMenuItem("Black player AI", false);
         blackPlayerAI.addItemListener(new ItemListener() {
+            /**
+             * Changes state which holds blackPlayer AI on item state change
+             * @param e
+             */
             @Override
             public void itemStateChanged(ItemEvent e) {
                 Table.get().setBlackPlayerAI(!Table.get().getBlackPlayerAI());
@@ -228,6 +242,10 @@ public class Table {
         //Highlight Legal Moves
        JCheckBoxMenuItem highlightMoves = new JCheckBoxMenuItem("Highlight legal moves", true);
         highlightMoves.addItemListener(new ItemListener() {
+            /**
+             * Changes state which holds highlight legal moves on item state change
+             * @param e
+             */
             @Override
             public void itemStateChanged(ItemEvent e) {
                 Table.get().setHighlightLegalMoves(!Table.get().getHighlightLegalMoves());
@@ -245,7 +263,10 @@ public class Table {
         //New Game
         JMenuItem newGame = new JMenuItem("New Game");
         newGame.addActionListener(new ActionListener(){
-
+            /**
+             * Creates new game on action event
+             * @param e
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Starting new game");
@@ -261,6 +282,10 @@ public class Table {
 
 
         customizeChessBoard.addActionListener(new ActionListener() {
+            /**
+             * Creates customizable board on action event
+             * @param e
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 Table.get().setCustomizeChessBoard(true);
@@ -298,7 +323,10 @@ public class Table {
         //Load FEN
         JMenuItem loadFEN = new JMenuItem("Load game from FEN");
         loadFEN.addActionListener(new ActionListener(){
-
+            /**
+             * Loads new board from fen file on action event
+             * @param e
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 String fenCodeFile = JOptionPane.showInputDialog("Type name of your save (format \"your input\".txt)");
@@ -332,7 +360,10 @@ public class Table {
         //Save FEN
         JMenuItem saveFEN = new JMenuItem("Save game to FEN");
         saveFEN.addActionListener(new ActionListener(){
-
+            /**
+             * Saves board to fen file on action event
+             * @param e
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 String fenFileName = JOptionPane.showInputDialog("Type the title of your saved board, you can find it in folder \"saves\"");
@@ -367,7 +398,10 @@ public class Table {
         //Load from PGN
         JMenuItem loadPGN = new JMenuItem("Load game from PGN");
         loadPGN.addActionListener(new ActionListener(){
-
+            /**
+             * Loads board from pgn file on action event
+             * @param e
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
 
@@ -402,7 +436,10 @@ public class Table {
         //Save to PGN
         JMenuItem savePGN = new JMenuItem("Save game to PGN");
         savePGN.addActionListener(new ActionListener(){
-
+            /**
+             * Saves game to pgn file on action event
+             * @param e
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 String pgnFileName = JOptionPane.showInputDialog("Type the title of your saved board, you can find it in folder \"saves\"");
@@ -437,7 +474,10 @@ public class Table {
         //Explore with PGN
         JMenuItem exploreGame = new JMenuItem("Explore game with PGN");
         exploreGame.addActionListener(new ActionListener(){
-
+            /**
+             * Creates list of board from pgn file in which player can traverse on action event
+             * @param e
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 String pgnCodePath = JOptionPane.showInputDialog("Type name of your save (format \"your input\".txt)");
@@ -500,6 +540,11 @@ public class Table {
         return fileMenu;
     }
 
+    /**
+     * Class that hadles GUI part of board
+     *
+     * @author David Mozny
+     */
     private class BoardTablePanel extends JPanel{
         List<TilePanel> boardTiles;
 
@@ -515,6 +560,10 @@ public class Table {
             validate();
         }
 
+        /**
+         * Main method of class that draws board to frame
+         * @param chessBoard
+         */
         public void drawBoard(Board chessBoard) {
             removeAll();
             for(TilePanel tilePanel : boardTiles){
@@ -526,6 +575,11 @@ public class Table {
         }
     }
 
+    /**
+     * Class that hadles GUI part of tiles and is used for player input
+     *
+     * @author David Mozny
+     */
     private class TilePanel extends JPanel{
 
         private int tileID;
@@ -538,6 +592,10 @@ public class Table {
             assignChessPieceIcon(chessBoard);
 
             addMouseListener(new MouseListener() { //will implement drag and drop and click and play - click and play will have right mouse button for release
+                /**
+                 * Main method for player input which reacts to mouse click and handles all the necessary processes that app must make to execute players input
+                 * @param e
+                 */
                 @Override
                 public void mouseClicked(MouseEvent e) {
 
@@ -742,7 +800,7 @@ public class Table {
             setBackground(rowNumber % 2 == columnNumber % 2 ? lightTileColor : darkTileColor);
         }
 
-        public void drawTile(Board board) {
+        private void drawTile(Board board) {
             assignTileColor();
             assignChessPieceIcon(chessBoard);
             highlightLegalMoves(board);

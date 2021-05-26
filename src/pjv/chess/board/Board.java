@@ -8,6 +8,11 @@ import pjv.chess.players.Player;
 import javax.management.ImmutableDescriptor;
 import java.util.*;
 
+/**
+ * This class is used for hadling all chess board related things and stores all info needed for chess game
+ *
+ * @author David Mozny
+ */
 public class Board {
 
     private List<Tile> chessBoard;
@@ -41,8 +46,6 @@ public class Board {
         Collection<Move> whiteLegalMoves = calculateLegalMoves(this.whitePieces);
         Collection<Move> blackLegalMoves = calculateLegalMoves(this.blackPieces);
 
-
-        //boolean isWhitesTurn = true;
         this.whiteTime = builder.whiteTime;
         this.blackTime = builder.blackTime;
 
@@ -52,9 +55,6 @@ public class Board {
         this.whitePlayer = new Player(this, true, whiteLegalMoves, blackLegalMoves, whiteTime, whitePlayerPanel);
         this.blackPlayer = new Player(this, false, whiteLegalMoves, blackLegalMoves, blackTime, blackPlayerPanel);
         this.currentPlayer = builder.thisTurn ? this.whitePlayer : this.blackPlayer;
-        //this.currentPlayer.startClock();
-
-
     }
 
     private List<ChessPiece> countActivePieces(List<Tile> chessBoard, boolean alliance){
@@ -71,25 +71,31 @@ public class Board {
     return activePieces;
     }
 
-    public Collection<ChessPiece> getWhitePieces() {
-        return this.whitePieces;
-    }
-    public Collection<ChessPiece> getBlackPieces(){
-        return this.blackPieces;
-    }
 
-    public Player getWhitePlayer(){
-        return this.whitePlayer;
-    }
+    /**
+     * All the basic getters of Board class
+     *
+     * @return concrete parametr of class
+     */
+    public Collection<ChessPiece> getWhitePieces() { return this.whitePieces; }
 
-    public Player getBlackPlayer(){
-        return this.blackPlayer;
-    }
+    public Collection<ChessPiece> getBlackPieces(){ return this.blackPieces; }
+
+    public Player getWhitePlayer(){ return this.whitePlayer; }
+
+    public Player getBlackPlayer(){ return this.blackPlayer; }
 
     public Player getCurrentPlayer(){ return this.currentPlayer; }
 
     public Pawn getEnPassantPawn(){ return this.enPassantPawn; }
 
+    public Tile getTile(int tileCoord){ return chessBoard.get(tileCoord); }
+
+    /**
+     * This method is used for getting all legal moves of pieces on board
+     *
+     * @return all legal moves for both players
+     */
     public Collection<Move> getAllLegalMoves(){
 
         Collection<Move> allLegalMoves = this.whitePlayer.getMyMoves();
@@ -98,8 +104,6 @@ public class Board {
 
         return allLegalMoves;
     }
-
-
     private Collection<Move> calculateLegalMoves(Collection<ChessPiece> chessPieces) {
         Collection<Move> legalMoves = new ArrayList<>();
 
@@ -118,6 +122,11 @@ public class Board {
 
     }
 
+    /**
+     * This method creates standard board (with standard piece distribution) using builder
+     *
+     * @return standard board
+     */
     public static Board createStandardBoard(){
         Builder builder = new Builder();
 
@@ -169,6 +178,11 @@ public class Board {
         return builder.build();
     }
 
+    /**
+     * This method creates custom board (only with two kings) using builder
+     *
+     * @return empty board with two kings
+     */
     public static Board createCustomBoard() {
         Builder builder = new Builder();
 
@@ -184,13 +198,6 @@ public class Board {
         return builder.build();
     }
 
-    public Tile getTile(int tileCoord){ return chessBoard.get(tileCoord); }
-
-    public int getWhiteTime(){ return this.whiteTime; }
-
-    public int getBlackTime(){ return this.blackTime; }
-
-
     @Override
     public String toString(){ //used for debugging
         StringBuilder builder = new StringBuilder();
@@ -203,12 +210,12 @@ public class Board {
         }
         return builder.toString();
     }
-    public void printAllLegalMovesOfPiece(Tile tile){ //used for debugging
-        for(Move move : tile.getPiece().calculateAllLegalMoves(this)){
-            System.out.println(tile.getPiece() + "'s legal move is on tile " + move.getDestinationCoordinate());
-        }
-    }
 
+    /**
+     * This class is used for more precise board creation
+     *
+     * @author David Mozny
+     */
     public static class Builder{
 
         Map<Integer, ChessPiece> boardConfig;
@@ -224,16 +231,28 @@ public class Board {
             this.boardConfig = new HashMap<>();
         }
 
+        /**
+         * all setters in builder for better built board
+         *
+         * @return
+         */
         public Builder setPiece(ChessPiece piece){
             this.boardConfig.put(piece.getPiecePosition(), piece);
             return this;
         }
-
         public Builder setNextTurn(boolean nextTurn){ //true - white
             this.thisTurn = nextTurn;
             return this;
         }
+        public void setEnPassantPawn(Pawn movedPawn) {
+            this.enPassantPawn = movedPawn;
+        }
 
+        /**
+         * all keeepers that set parameter given to the newly built board
+         *
+         * @return builder
+         */
         public Builder keepWhitePlayerPanel(PlayerPanel whitePlayerPanel){
             this.whitePlayerPanel = whitePlayerPanel;
             return this;
@@ -263,14 +282,8 @@ public class Board {
             }
             return this;
         }
-
-
         public Board build(){
             return new Board(this);
-        }
-
-        public void setEnPassantPawn(Pawn movedPawn) {
-            this.enPassantPawn = movedPawn;
         }
     }
 }

@@ -4,6 +4,11 @@ import jdk.jshell.execution.Util;
 import pjv.chess.gui.PlayerPanel;
 import pjv.chess.pieces.*;
 
+/**
+ * This class holds all the methods usef for FEN to Board transition and vice-versa
+ *
+ * @author David Mozny
+ */
 public class FENUtils {
 
     public static String SAVE_PATH = "saves/fen/";
@@ -12,6 +17,12 @@ public class FENUtils {
         throw new RuntimeException("Not instantiable");
     }
 
+    /**
+     * Creates new Board with given fenString
+     *
+     * @param fenString
+     * @return new Board
+     */
     public static Board createGameFromFEN(String fenString){
         Board.Builder builder = new Board.Builder();
 
@@ -124,6 +135,12 @@ public class FENUtils {
         return tokenizedFEN;
     }
 
+    /**
+     * Codes Board state to FEN code
+     *
+     * @param board
+     * @return FEN code
+     */
     public static String saveGameToFEN(Board board){
         return calculateBoardText(board) + " " +
                 calculateCurrentPlayerText(board) + " " +

@@ -6,6 +6,11 @@ import pjv.chess.board.Move;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Abstract class that is father to all pieces classes (Rook, Bishop..)
+ *
+ * @author David Mozny
+ */
 public abstract class ChessPiece {
 
     int piecePosition;
@@ -40,6 +45,10 @@ public abstract class ChessPiece {
         return hash;
     }
 
+    /**
+     * All getters for ChessPiece class
+     * @return
+     */
     public int getPiecePosition() {
         return this.piecePosition;
     }
@@ -52,12 +61,29 @@ public abstract class ChessPiece {
         return this.isFirstMove;
     }
 
+    /**
+     * Flips first move parameter of ChessPiece
+     */
     public void switchFirstMove(){ this.isFirstMove = false; }
 
+    /**
+     * Calculates legal move of piece, most important method in ChessPiece class
+     * @param board
+     * @return list of legal moves
+     */
     public abstract List<Move> calculateAllLegalMoves(Board board);
 
+    /**
+     * Checks if given piece is King
+     * @return true/false
+     */
     public abstract boolean isKing();
 
+    /**
+     * Second most important method in ChessPiece class that handles deleting chessPiece and creating new one between moves
+     * @param move
+     * @return new ChessPiece
+     */
     public abstract ChessPiece movePiece(Move move);
 
 }

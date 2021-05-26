@@ -8,7 +8,11 @@ import pjv.chess.board.Utils;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Extension of chessPiece class that represents Pawn piece
+ *
+ * @author David Mozny
+ */
 public class Pawn extends ChessPiece{
 
     private final static int[] MOVE_OFFSETS = {7, 8, 9, 16}; //positive for black, negative for white
@@ -21,7 +25,11 @@ public class Pawn extends ChessPiece{
     public Pawn(int piecePosition, boolean alliance) {
         super(piecePosition, alliance, true);
     }
-
+    /**
+     * Calculates legal move of piece, most important method in ChessPiece class
+     * @param board
+     * @return list of legal moves
+     */
     @Override
     public List<Move> calculateAllLegalMoves(Board board) {
         int offsetCoefficient = this.alliance ? WHITE_COEFFICIENT : BLACK_COEFFICIENT; //white moves in negative direction and is "true"
@@ -96,14 +104,21 @@ public class Pawn extends ChessPiece{
     @Override
     public String toString(){ return "P"; }
 
+    /**
+     * Checks if given piece is King
+     * @return true/false
+     */
     @Override
     public boolean isKing(){
         return false;
     }
-
+    /**
+     * Second most important method in ChessPiece class that handles deleting chessPiece and creating new one between moves
+     * @param move
+     * @return new ChessPiece
+     */
     @Override
     public ChessPiece movePiece(Move move) {
-
         return new Pawn(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
     }
 

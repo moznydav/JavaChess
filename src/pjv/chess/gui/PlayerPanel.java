@@ -4,6 +4,11 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 
+/**
+ * This class handles player panel which main purpose is containment of chess clock
+ *
+ * @author David Mozny
+ */
 public class PlayerPanel extends JPanel{
     private JPanel takenPiecesPanel;
     private JPanel chessClockPanel;
@@ -46,6 +51,10 @@ public class PlayerPanel extends JPanel{
         setPreferredSize(PLAYER_PANEL_DIMENSION);
     }
 
+    /**
+     * Updates chess clock with current time left
+     * @param timeLeft
+     */
     public void update(int timeLeft){
         chessClockText.setText(formatTime(timeLeft));
     }

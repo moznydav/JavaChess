@@ -9,6 +9,11 @@ import pjv.chess.board.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Extension of chessPiece class that represents Bishop piece
+ *
+ * @author David Mozny
+ */
 public class Bishop extends ChessPiece{
 
     private final static int[] MOVE_OFFSETS = {-9, -7, 7, 9}; //offsets from current location for "bishop move"
@@ -20,7 +25,11 @@ public class Bishop extends ChessPiece{
     public Bishop(int piecePosition, boolean alliance, boolean isFirstMove){
         super(piecePosition, alliance, isFirstMove);
     }
-
+    /**
+     * Calculates legal move of piece, most important method in ChessPiece class
+     * @param board
+     * @return list of legal moves
+     */
     @Override
     public List<Move> calculateAllLegalMoves(Board board) {
         List<Move> legalMoves = new ArrayList<>();
@@ -38,7 +47,7 @@ public class Bishop extends ChessPiece{
                     ChessPiece pieceAtDestination = destinationTile.getPiece();
                     boolean alliance = pieceAtDestination.alliance;
 
-                    if (alliance != this.alliance) { //
+                    if (alliance != this.alliance) {
                         legalMoves.add(new Move.AttackMove(board, this, destinationCoordinate, pieceAtDestination));
                     }
                     break;
@@ -50,11 +59,19 @@ public class Bishop extends ChessPiece{
     @Override
     public String toString(){ return "B"; }
 
+    /**
+     * Checks if given piece is King
+     * @return true/false
+     */
     @Override
     public boolean isKing(){
         return false;
     }
-
+    /**
+     * Second most important method in ChessPiece class that handles deleting chessPiece and creating new one between moves
+     * @param move
+     * @return new ChessPiece
+     */
     @Override
     public ChessPiece movePiece(Move move) {
 

@@ -22,6 +22,12 @@ public abstract class Tile {
         return emptyTileMap;
     }
 
+    /**
+     * Creates new Tile
+     * @param tileCoord
+     * @param piece
+     * @return new Tile
+     */
     public static Tile createTile(int tileCoord, ChessPiece piece){
         if(piece != null){
             return new OccupiedTile(tileCoord, piece);
@@ -34,13 +40,19 @@ public abstract class Tile {
         this.tileCoord = tileCoord;
     }
 
+    /**
+     * Checks if Tile is empty
+     * @return true/false
+     */
     public abstract boolean isEmpty();
 
     public abstract ChessPiece getPiece();
 
     public int getTileCoordinates(){ return this.tileCoord;}
 
-
+    /**
+     * Extensions of Tile class for easier hadling
+     */
     public static class EmptyTile extends Tile{
 
         EmptyTile(int coord) {

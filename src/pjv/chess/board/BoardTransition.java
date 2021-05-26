@@ -3,6 +3,12 @@ package pjv.chess.board;
 import pjv.chess.board.Board;
 import pjv.chess.board.Move;
 
+/**
+ * This class is used for good transition between boards
+ * This class is also used for checking if move is valid via MoveStatus
+ *
+ * @author David Mozny
+ */
 public class BoardTransition {
 
     private Board oldBoard;
@@ -23,9 +29,5 @@ public class BoardTransition {
 
     public Board getNewBoard(){
         return this.newBoard;
-    }
-
-    public Board getOldBoard(){
-        return this.oldBoard;
     }
 }

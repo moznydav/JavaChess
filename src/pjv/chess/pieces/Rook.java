@@ -7,7 +7,11 @@ import pjv.chess.board.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Extension of chessPiece class that represents Rook piece
+ *
+ * @author David Mozny
+ */
 public class Rook extends ChessPiece{
     private final static int[] MOVE_OFFSETS = {-8, -1, 1, 8}; //offsets from current location for "rook move"
 
@@ -18,7 +22,11 @@ public class Rook extends ChessPiece{
     public Rook(int piecePosition, boolean alliance, boolean isFirstMove){
         super(piecePosition, alliance, isFirstMove);
     }
-
+    /**
+     * Calculates legal move of piece, most important method in ChessPiece class
+     * @param board
+     * @return list of legal moves
+     */
     @Override
     public List<Move> calculateAllLegalMoves(Board board) {
         List<Move> legalMoves = new ArrayList<>();
@@ -42,21 +50,25 @@ public class Rook extends ChessPiece{
                     break;
                 }
             }
-
-
         }
         return legalMoves;
     }
 
     @Override
     public String toString(){ return "R"; }
-
-
+    /**
+     * Checks if given piece is King
+     * @return true/false
+     */
     @Override
     public boolean isKing(){
         return false;
     }
-
+    /**
+     * Second most important method in ChessPiece class that handles deleting chessPiece and creating new one between moves
+     * @param move
+     * @return new ChessPiece
+     */
     @Override
     public ChessPiece movePiece(Move move) {
 

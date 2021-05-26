@@ -14,6 +14,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Class that contains and handles all Player related things, such as player clock, pieces, moves and game state(check, mate, stalemate)
+ *
+ * @author David Mozny
+ */
 public class Player {
     Board board;
     King playerKing;
@@ -53,22 +58,15 @@ public class Player {
         throw new RuntimeException("Invalid board, player has no King");
     }
 
+    /**
+     * All getters used by class Player
+     * @return
+     */
+    public Collection<ChessPiece> getMyPieces() { return this.alliance ? this.board.getWhitePieces() : this.board.getBlackPieces(); }
 
+    public Collection<ChessPiece> getOpponentsPieces(){ return !this.alliance ? this.board.getWhitePieces() : this.board.getBlackPieces(); }
 
-
-    //all getters
-
-    public Collection<ChessPiece> getMyPieces() {
-        return this.alliance ? this.board.getWhitePieces() : this.board.getBlackPieces();
-    }
-
-    public Collection<ChessPiece> getOpponentsPieces(){
-        return !this.alliance ? this.board.getWhitePieces() : this.board.getBlackPieces();
-    }
-
-    public Player getOpponent(){
-        return this.alliance ? this.board.getBlackPlayer() : this.board.getWhitePlayer();
-    }
+    public Player getOpponent(){ return this.alliance ? this.board.getBlackPlayer() : this.board.getWhitePlayer(); }
 
     public King getPlayerKing() { return this.playerKing; }
 
@@ -80,11 +78,19 @@ public class Player {
 
     public PlayerPanel getPlayerPanel(){ return this.playerPanel;}
 
-    public void setPlayerPanel(PlayerPanel playerPanel){
-        this.playerPanel = playerPanel;
-    }
+    /**
+     * All setters used by class Player
+     * @param playerPanel
+     */
 
+    public void setPlayerPanel(PlayerPanel playerPanel){ this.playerPanel = playerPanel; }
 
+    /**
+     * Calculates available castle moves of player
+     * @param opponentLegalMoves
+     * @param alliance
+     * @return collection of castle moves
+     */
     public Collection<Move> calculateCastleMoves(Collection<Move> opponentLegalMoves, boolean alliance){ //white = true;
         Collection<Move> kingCastleMoves = new ArrayList<>();
         int kingsPosition = alliance ? Utils.WHITE_KING_POSITION : Utils.BLACK_KING_POSITION;
@@ -114,7 +120,7 @@ public class Player {
         return kingCastleMoves;
     }
 
-    public boolean isLegalMove(Move move){
+    private boolean isLegalMove(Move move){
         return this.myMoves.contains(move);
     }
 
@@ -126,16 +132,27 @@ public class Player {
         }
     }
 
+    /**
+     * Checks if player is in check
+     * @return true/false
+     */
     public boolean isInCheck(){
         return !calculateAttacksOnTile(this.playerKing.getPiecePosition(), opponentsMoves).isEmpty();
     }
+    /**
+     * Checks if player is in checkmate
+     * @return true/false
+     */
     public boolean isInCheckMate(){
         if(isInCheck() && !hasMoves()){
             return true;
         }
         return false;
     }
-
+    /**
+     * Checks if player is in stalemate
+     * @return true/false
+     */
     public boolean isInStaleMate(){
         return !this.isInCheck && !hasMoves();
     }
@@ -150,21 +167,27 @@ public class Player {
         return false;
     }
 
-
-    public boolean hasCastled(){
-        return false;
-    }
-
+    /**
+     * Starts player chess clock, also handles run method of chessClock every second
+     */
     public void startClock(){
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
         executor.scheduleAtFixedRate(this.chessClock, 0, 1, TimeUnit.SECONDS);
     }
 
+    /**
+     * Stops player chess clock
+     */
     public void stopClock(){
         this.chessClock.requestStop();
         this.playerPanel.update(this.chessClock.getTimeLeft());
     }
 
+    /**
+     * One of the most important player methods that handles execution of chosen move and returns BoardTransition which is the result of given move
+     * @param move
+     * @return new BoardTransition
+     */
     public BoardTransition makeMove(Move move){
 
         if(!isLegalMove(move)){
@@ -192,6 +215,10 @@ public class Player {
         return attackMoves;
     }
 
+    /**
+     * Checks if player is king side castle capable
+     * @return true/false
+     */
     public boolean isKingSideCastleCapable() {
         int kingSideRookCoordinate = this.alliance ? 63 : 7;
         if(this.playerKing.isFirstMove() && this.board.getTile(kingSideRookCoordinate).getPiece().isFirstMove()){
@@ -199,7 +226,10 @@ public class Player {
         }
         return false;
     }
-
+    /**
+     * Checks if player is queen side castle capable
+     * @return true/false
+     */
     public boolean isQueenSideCastleCapable() {
         int QueenSideRookCoordinate = this.alliance ? 56 : 0;
         if(this.playerKing.isFirstMove() && this.board.getTile(QueenSideRookCoordinate).getPiece().isFirstMove()){

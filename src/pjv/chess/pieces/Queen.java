@@ -7,14 +7,22 @@ import pjv.chess.board.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Extension of chessPiece class that represents Queen piece
+ *
+ * @author David Mozny
+ */
 public class Queen extends ChessPiece{
     private final static int[] MOVE_OFFSETS = {-9, -8, -7, -1, 1, 7, 8, 9}; //offsets from current location for "queen move"
 
     public Queen(int piecePosition, boolean alliance) {
         super(piecePosition, alliance, true);
     }
-
+    /**
+     * Calculates legal move of piece, most important method in ChessPiece class
+     * @param board
+     * @return list of legal moves
+     */
     @Override
     public List<Move> calculateAllLegalMoves(Board board) {
         List<Move> legalMoves = new ArrayList<>();
@@ -47,11 +55,19 @@ public class Queen extends ChessPiece{
     @Override
     public String toString(){ return "Q"; }
 
+    /**
+     * Checks if given piece is King
+     * @return true/false
+     */
     @Override
     public boolean isKing(){
         return false;
     }
-
+    /**
+     * Second most important method in ChessPiece class that handles deleting chessPiece and creating new one between moves
+     * @param move
+     * @return new ChessPiece
+     */
     @Override
     public ChessPiece movePiece(Move move) {
 

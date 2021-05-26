@@ -8,6 +8,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Runnable class that's main purpose is counting down time left as normal chess clock would do
+ *
+ * @author David Mozny
+ */
 public class ChessClock implements Runnable{
 
     int timeLeft;
@@ -23,6 +28,9 @@ public class ChessClock implements Runnable{
         this.playerPanel = playerPanel;
     }
 
+    /**
+     * Main method of class that decreases time left of active player and updates chess clock GUI
+     */
     @Override
     public void run() {
         if (!isStopRequested()) {
@@ -43,10 +51,19 @@ public class ChessClock implements Runnable{
             }
         }
     }
+
+    /**
+     * Method used for stopping active thread
+     */
     public synchronized void requestStop(){
         this.stopRequested = true;
     }
-    public synchronized boolean isStopRequested(){
+
+    /**
+     * Getter used for stopping active thread
+     * @return
+     */
+    private synchronized boolean isStopRequested(){
         return this.stopRequested;
     }
 
@@ -58,5 +75,9 @@ public class ChessClock implements Runnable{
         }
     }
 
+    /**
+     * Rest of getters of the ChessClock class
+     * @return
+     */
     public int getTimeLeft(){ return this.timeLeft;}
 }

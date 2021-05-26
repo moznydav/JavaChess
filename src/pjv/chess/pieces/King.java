@@ -8,7 +8,11 @@ import pjv.chess.board.Utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
+/**
+ * Extension of chessPiece class that represents King piece
+ *
+ * @author David Mozny
+ */
 public class King extends ChessPiece{
     private final static int[] MOVE_OFFSETS = {-9, -8, -7, -1, 1, 7, 8, 9}; //offsets from current location for "king move"
 
@@ -19,7 +23,11 @@ public class King extends ChessPiece{
     public King(int piecePosition, boolean alliance, boolean isFirstMove){
         super(piecePosition, alliance, isFirstMove);
     }
-
+    /**
+     * Calculates legal move of piece, most important method in ChessPiece class
+     * @param board
+     * @return list of legal moves
+     */
     @Override
     public List<Move> calculateAllLegalMoves(Board board) {
         List<Move> legalMoves = new ArrayList<>();
@@ -48,14 +56,21 @@ public class King extends ChessPiece{
     @Override
     public String toString(){ return "K"; }
 
+    /**
+     * Checks if given piece is King
+     * @return true/false
+     */
     @Override
     public boolean isKing(){
         return true;
     }
-
+    /**
+     * Second most important method in ChessPiece class that handles deleting chessPiece and creating new one between moves
+     * @param move
+     * @return new ChessPiece
+     */
     @Override
     public ChessPiece movePiece(Move move) {
-
         return new King(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance(), false);
     }
 
