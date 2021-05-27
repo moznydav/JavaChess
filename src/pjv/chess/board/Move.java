@@ -747,7 +747,7 @@ public abstract class Move {
      *
      * @author David Mozny
      */
-    public static class moveMaker{
+    public static class MoveMaker {
         public static Move createMove(Board board, int pieceCoordinate, int destinationCoordinate) {
             for (Move move : board.getAllLegalMoves()){
                 if (move.getCurrentCoordinate()== pieceCoordinate &&

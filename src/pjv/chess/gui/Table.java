@@ -614,7 +614,7 @@ public class Table {
                                 if(sourceTile.getTileCoordinates() == destinationTile.getTileCoordinates()){
                                     clearSelection();
                                 } else {
-                                    Move move = Move.moveMaker.createMove(chessBoard, sourceTile.getTileCoordinates(), destinationTile.getTileCoordinates());
+                                    Move move = Move.MoveMaker.createMove(chessBoard, sourceTile.getTileCoordinates(), destinationTile.getTileCoordinates());
                                     BoardTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
                                     if(transition.getMoveStatus().isDone()){
                                         chessBoard.getCurrentPlayer().stopClock();
